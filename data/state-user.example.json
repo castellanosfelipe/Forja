@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "owner": {
+    "userId": "8b0529df-e123-4ce8-9ab7-b02f14aeaa4f",
+    "stateFileKey": "user",
+    "createdAt": "2026-08-24T14:00:00.000Z",
+    "updatedAt": "2026-08-24T15:20:00.000Z"
+  },
+  "preferences": {
+    "locale": "es-CO",
+    "timeZone": "America/Bogota",
+    "units": "metric",
+    "weekStartsOn": 1,
+    "restTimer": {
+      "defaultSeconds": 120,
+      "sound": true,
+      "vibration": true,
+      "webPushWhenHidden": true
+    },
+    "guidedWorkout": {
+      "requestWakeLock": true,
+      "showRpe": true,
+      "showRir": true,
+      "prefillPreviousLoad": true
+    }
+  },
+  "bodyWeight": {
+    "goal": {
+      "targetKg": 78,
+      "targetDate": "2026-12-31"
+    },
+    "entries": [
+      {
+        "id": "54ecfd40-f742-4597-9231-5c4e49298b3c",
+        "measuredAt": "2026-08-17T11:30:00.000Z",
+        "weightKg": 82.4,
+        "note": "Medición al despertar"
+      },
+      {
+        "id": "77ac2f5d-6b8f-43de-94d3-81ca6ffdc7d6",
+        "measuredAt": "2026-08-24T11:25:00.000Z",
+        "weightKg": 81.9,
+        "note": null
+      }
+    ]
+  },
+  "bodyMetrics": {
+    "profile": {
+      "sex": "male",
+      "ageYears": 30,
+      "heightCm": 180,
+      "activityLevel": "moderate",
+      "goal": "maintain"
+    },
+    "entries": [
+      {
+        "id": "6dd21d1d-680d-4d7e-8c4f-3c297c8461fb",
+        "measuredAt": "2026-08-24T11:25:00.000Z",
+        "weightKg": 81.9,
+        "neckCm": 40,
+        "waistCm": 90,
+        "hipCm": null,
+        "bmi": 25.3,
+        "bodyFatPercent": 18.4,
+        "leanMassKg": 66.8,
+        "ffmi": 20.6,
+        "basalMetabolicRateKcal": 1799,
+        "totalDailyEnergyExpenditureKcal": 2788,
+        "targetCaloriesKcal": 2788,
+        "macros": {
+          "proteinGrams": 147,
+          "fatGrams": 93,
+          "carbohydrateGrams": 341,
+          "proteinPercent": 21,
+          "fatPercent": 30,
+          "carbohydratePercent": 49
+        },
+        "note": "Medición al despertar"
+      }
+    ]
+  },
+  "bodyMeasurementReminder": {
+    "enabled": true,
+    "intervalMonths": 1,
+    "nextDueAt": "2026-09-24T11:25:00.000Z",
+    "lastNotifiedAt": null
+  },
+  "onboarding": {
+    "completedAt": null,
+    "trainingGoal": "hypertrophy",
+    "experience": "beginner",
+    "trainingDaysPerWeek": 3,
+    "sessionMinutes": 60,
+    "equipment": "full-gym",
+    "priorityMuscles": [],
+    "limitations": [],
+    "generatedAt": null,
+    "methodologyVersion": "forja-safe-v1"
+  },
+  "exerciseLibrary": [
+    {
+      "id": "back-squat",
+      "name": "Sentadilla trasera",
+      "category": "quadriceps",
+      "equipment": [
+        "barbell",
+        "rack"
+      ],
+      "measurement": "repetitions",
+      "isBodyweight": false,
+      "isPerSide": false,
+      "muscles": {
+        "primary": [
+          "quadriceps",
+          "gluteus-maximus"
+        ],
+        "secondary": [
+          "hamstrings",
+          "erector-spinae",
+          "abdominals"
+        ]
+      }
+    },
+    {
+      "id": "bench-press",
+      "name": "Press de banca",
+      "category": "chest",
+      "equipment": [
+        "barbell",
+        "bench"
+      ],
+      "measurement": "repetitions",
+      "isBodyweight": false,
+      "isPerSide": false,
+      "muscles": {
+        "primary": [
+          "pectoralis-major"
+        ],
+        "secondary": [
+          "anterior-deltoid",
+          "triceps"
+        ]
+      }
+    },
+    {
+      "id": "bulgarian-split-squat",
+      "name": "Sentadilla búlgara",
+      "category": "quadriceps",
+      "equipment": [
+        "dumbbell",
+        "bench"
+      ],
+      "measurement": "repetitions",
+      "isBodyweight": false,
+      "isPerSide": true,
+      "muscles": {
+        "primary": [
+          "quadriceps",
+          "gluteus-maximus"
+        ],
+        "secondary": [
+          "hamstrings",
+          "adductors"
+        ]
+      }
+    },
+    {
+      "id": "pull-up",
+      "name": "Dominada",
+      "category": "back",
+      "equipment": [
+        "pull-up-bar"
+      ],
+      "measurement": "repetitions",
+      "isBodyweight": true,
+      "isPerSide": false,
+      "muscles": {
+        "primary": [
+          "latissimus-dorsi"
+        ],
+        "secondary": [
+          "biceps",
+          "rhomboids",
+          "posterior-deltoid"
+        ]
+      }
+    },
+    {
+      "id": "front-plank",
+      "name": "Plancha frontal",
+      "category": "core",
+      "equipment": [],
+      "measurement": "duration",
+      "isBodyweight": true,
+      "isPerSide": false,
+      "muscles": {
+        "primary": [
+          "abdominals"
+        ],
+        "secondary": [
+          "obliques",
+          "gluteus-maximus"
+        ]
+      }
+    }
+  ],
+  "weeklyPlan": {
+    "id": "base-strength-plan",
+    "name": "Fuerza base",
+    "effectiveFrom": "2026-08-03",
+    "days": [
+      {
+        "id": "monday-a",
+        "weekday": 1,
+        "name": "Día A",
+        "blocks": [
+          {
+            "id": "main-a",
+            "type": "standard",
+            "exercises": [
+              {
+                "exerciseId": "back-squat",
+                "sets": 3,
+                "repetitions": {
+                  "min": 5,
+                  "max": 5
+                },
+                "restSeconds": 180,
+                "targetRpe": 8
+              },
+              {
+                "exerciseId": "bench-press",
+                "sets": 3,
+                "repetitions": {
+                  "min": 5,
+                  "max": 5
+                },
+                "restSeconds": 180,
+                "targetRpe": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "wednesday-b",
+        "weekday": 3,
+        "name": "Día B",
+        "blocks": [
+          {
+            "id": "accessory-superset-b",
+            "type": "superset",
+            "rounds": 3,
+            "restAfterRoundSeconds": 120,
+            "exercises": [
+              {
+                "exerciseId": "bulgarian-split-squat",
+                "sets": 3,
+                "repetitions": {
+                  "min": 8,
+                  "max": 12
+                },
+                "restSeconds": 0,
+                "targetRpe": 8
+              },
+              {
+                "exerciseId": "pull-up",
+                "sets": 3,
+                "repetitions": {
+                  "min": 6,
+                  "max": 10
+                },
+                "restSeconds": 0,
+                "targetRpe": 8
+              }
+            ]
+          },
+          {
+            "id": "timed-core-b",
+            "type": "standard",
+            "exercises": [
+              {
+                "exerciseId": "front-plank",
+                "sets": 3,
+                "durationSeconds": 45,
+                "restSeconds": 60,
+                "targetRpe": 7
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "scheduleOverrides": [
+    {
+      "id": "8ab5d851-c8ce-485a-b6d4-24948ab2c7ac",
+      "baseDayId": "wednesday-b",
+      "originalDate": "2026-08-26",
+      "scheduledDate": "2026-08-27",
+      "reason": "Viaje",
+      "createdAt": "2026-08-24T15:00:00.000Z"
+    }
+  ],
+  "workoutSessions": [
+    {
+      "id": "cdb0ebc7-16bd-4e0d-874b-e3223708ba6c",
+      "planDayId": "monday-a",
+      "scheduledDate": "2026-08-24",
+      "startedAt": "2026-08-24T13:00:00.000Z",
+      "completedAt": "2026-08-24T14:05:00.000Z",
+      "status": "completed",
+      "exercises": [
+        {
+          "exerciseId": "back-squat",
+          "sets": [
+            {
+              "setNumber": 1,
+              "loadKg": 80,
+              "repetitions": 5,
+              "durationSeconds": null,
+              "side": null,
+              "rpe": 7.5,
+              "rir": 3,
+              "completedAt": "2026-08-24T13:15:00.000Z"
+            },
+            {
+              "setNumber": 2,
+              "loadKg": 80,
+              "repetitions": 5,
+              "durationSeconds": null,
+              "side": null,
+              "rpe": 8,
+              "rir": 2,
+              "completedAt": "2026-08-24T13:20:00.000Z"
+            },
+            {
+              "setNumber": 3,
+              "loadKg": 80,
+              "repetitions": 5,
+              "durationSeconds": null,
+              "side": null,
+              "rpe": 8.5,
+              "rir": 1,
+              "completedAt": "2026-08-24T13:25:00.000Z"
+            }
+          ],
+          "estimatedOneRepMaxKg": 93.3,
+          "notes": null
+        }
+      ],
+      "notes": "Sesión completada sin dolor."
+    }
+  ],
+  "progression": {
+    "exerciseRules": [
+      {
+        "exerciseId": "back-squat",
+        "strategy": "greyskull-lp",
+        "config": {
+          "incrementKg": 2.5,
+          "deloadAfterFailures": 2,
+          "deloadPercent": 10,
+          "amrapSetNumber": 3
+        },
+        "state": {
+          "nextLoadKg": 82.5,
+          "consecutiveFailures": 0,
+          "deloadCount": 0,
+          "lastEvaluatedSessionId": "cdb0ebc7-16bd-4e0d-874b-e3223708ba6c"
+        }
+      },
+      {
+        "exerciseId": "bench-press",
+        "strategy": "linear-progression",
+        "config": {
+          "incrementKg": 1.25,
+          "deloadAfterFailures": 3,
+          "deloadPercent": 7.5
+        },
+        "state": {
+          "nextLoadKg": 61.25,
+          "consecutiveFailures": 0,
+          "deloadCount": 0,
+          "lastEvaluatedSessionId": null
+        }
+      },
+      {
+        "exerciseId": "pull-up",
+        "strategy": "double-progression",
+        "config": {
+          "sets": 3,
+          "repRange": {
+            "min": 6,
+            "max": 10
+          },
+          "incrementKg": 2.5,
+          "deloadAfterFailures": 3,
+          "deloadPercent": 10
+        },
+        "state": {
+          "nextLoadKg": 0,
+          "consecutiveFailures": 0,
+          "deloadCount": 0,
+          "lastEvaluatedSessionId": null
+        }
+      }
+    ]
+  },
+  "pushSubscriptions": [],
+  "restTimers": []
+}

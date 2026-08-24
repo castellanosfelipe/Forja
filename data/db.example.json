@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "users": [
+    {
+      "id": "8b0529df-e123-4ce8-9ab7-b02f14aeaa4f",
+      "webauthnUserId": "OGIwNTI5ZGYtZTEyMy00Y2U4LTlhYjctYjAyZjE0YWVhYTRm",
+      "username": "user",
+      "displayName": "Usuario de ejemplo",
+      "stateFileKey": "user",
+      "createdAt": "2026-08-24T14:00:00.000Z",
+      "updatedAt": "2026-08-24T14:05:00.000Z",
+      "passkeys": [
+        {
+          "id": "cGFzc2tleS1jcmVkZW50aWFsLWV4YW1wbGU",
+          "publicKey": "pQECAyYgASFYIBvQmVZ0oM3f0mQ1dP1VYqVhYw47zH5K2f_y44M6Il0iWCAoYS8qN9XqvJZ1oH2m8L7V4hD0rS2eP5cU9wT3bA",
+          "counter": 0,
+          "transports": [
+            "internal",
+            "hybrid"
+          ],
+          "deviceType": "multiDevice",
+          "backedUp": true,
+          "createdAt": "2026-08-24T14:05:00.000Z",
+          "lastUsedAt": null
+        }
+      ],
+      "passwordCredential": null
+    }
+  ]
+}
