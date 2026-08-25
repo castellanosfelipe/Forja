@@ -30,17 +30,18 @@ describe('AppShell recovery and conflict protection', () => {
     const user = userEvent.setup();
     const load = vi.fn(async () => undefined);
     prepareAuth();
-    useStateStore.setState({ state: null, status: 'error', error: 'Servidor no disponible.', load });
+    useStateStore.setState({ state: null, status: 'error', error: 'Invalid server state response.', load });
 
     render(<MemoryRouter><AppShell /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: 'No pudimos cargar tus datos' })).toBeTruthy();
-    expect(screen.getByRole('alert').textContent).toContain('Servidor no disponible.');
+    expect(screen.getByRole('alert').textContent).toContain('No pudimos guardar o recuperar tus datos.');
+    expect(screen.getByRole('alert').textContent).not.toMatch(/invalid|server|state|response/i);
     await user.click(screen.getByRole('button', { name: 'Intentar de nuevo' }));
     expect(load).toHaveBeenCalled();
   });
 
-  it('requires confirmation before replacing pending local data with the server version', async () => {
+  it('requires confirmation before discarding pending changes from this device', async () => {
     const user = userEvent.setup();
     const refresh = vi.fn(async () => undefined);
     prepareAuth();
@@ -56,14 +57,14 @@ describe('AppShell recovery and conflict protection', () => {
 
     render(<MemoryRouter><AppShell /></MemoryRouter>);
 
-    await user.click(screen.getByRole('button', { name: 'Usar versión del servidor' }));
-    expect(screen.getByRole('alertdialog', { name: '¿Reemplazar la copia local?' })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Descartar cambios de este dispositivo' }));
+    expect(screen.getByRole('alertdialog', { name: '¿Descartar los cambios de este dispositivo?' })).toBeTruthy();
     expect(refresh).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Conservar' }));
     expect(refresh).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: 'Usar versión del servidor' }));
-    await user.click(screen.getByRole('button', { name: 'Descartar y usar servidor' }));
+    await user.click(screen.getByRole('button', { name: 'Descartar cambios de este dispositivo' }));
+    await user.click(screen.getByRole('button', { name: 'Descartar cambios y continuar' }));
     await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
   });
 

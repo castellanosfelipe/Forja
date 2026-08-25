@@ -7,6 +7,7 @@ import { useStateStore } from '../../stores/state.store';
 import { formatDate, localDateKey, weekdayName } from '../../utils/dates';
 import { Abbreviation } from '../../components/feedback/Abbreviation';
 import type { PlanDay } from '../../types/state';
+import { userFacingError } from '../../utils/user-facing-error';
 
 type PendingOperation = 'add' | 'reschedule' | 'remove' | null;
 
@@ -34,8 +35,7 @@ function addDays(dateKey: string, days: number): string {
 }
 
 function operationError(cause: unknown, action: string): string {
-  const detail = cause instanceof Error && cause.message.trim() ? ` ${cause.message}` : '';
-  return `No pudimos ${action}.${detail}`;
+  return userFacingError(cause, `No pudimos ${action}. Inténtalo de nuevo.`);
 }
 
 export function PlanPage() {
@@ -245,7 +245,7 @@ export function PlanPage() {
                     <ol>
                       {block.exercises.map((prescription, prescriptionIndex) => {
                         const exercise = state.exerciseLibrary.find((item) => item.id === prescription.exerciseId);
-                        const label = exercise?.name ?? prescription.exerciseId;
+                        const label = exercise?.name ?? 'Ejercicio no disponible';
                         const tempo = prescription.tempo ? `${prescription.tempo.eccentricSeconds}–${prescription.tempo.pauseSeconds}–${prescription.tempo.concentricSeconds}` : null;
                         return <li key={`${prescription.exerciseId}-${prescriptionIndex}`}><strong>{label}</strong><span>{prescription.sets} × {prescription.durationSeconds !== undefined ? `${prescription.durationSeconds} s` : prescription.repetitions ? `${prescription.repetitions.min}–${prescription.repetitions.max}` : 'libre'}{block.type === 'superset' ? ' · sin descanso entre ejercicios' : prescription.restSeconds === 0 ? ' · sin descanso' : ` · ${formatRestDuration(prescription.restSeconds)} de descanso`}{tempo ? ` · tempo ${tempo}` : ''}{prescription.targetRpe ? <> · <span className="plan-rpe"><Abbreviation code="RPE" /> {prescription.targetRpe}</span></> : null}</span><button className="plan-remove-button" type="button" disabled={pendingOperation !== null} aria-label={`Quitar ${label} de ${day.name}`} onClick={() => setPendingRemoval({ kind: 'prescription', dayId: day.id, blockId: block.id, exerciseId: prescription.exerciseId, label })}><Trash2 size={14} /></button></li>;
                       })}
@@ -275,7 +275,7 @@ export function PlanPage() {
         </aside>
 
         <aside className="content-card reschedule-card" ref={rescheduleCardRef}>
-          <p className="eyebrow">Excepción, no mutación</p><h2 ref={rescheduleHeadingRef} tabIndex={-1}>Mover una sesión</h2><p className="muted" id="reschedule-help">Solo cambia esta fecha. Al elegir un día, FORJA alinea la fecha original con su próxima aparición; el plan base seguirá intacto.</p>
+          <p className="eyebrow">Cambio puntual</p><h2 ref={rescheduleHeadingRef} tabIndex={-1}>Mover una sesión</h2><p className="muted" id="reschedule-help">Solo moverás esta sesión; las demás fechas del plan no cambiarán.</p>
           <form id="reschedule-form" aria-busy={pendingOperation === 'reschedule'} onSubmit={reschedule}>
             <fieldset className="stack-form form-fieldset" disabled={pendingOperation !== null || days.length === 0}>
             <label>Día del plan<select required aria-describedby="reschedule-help" value={dayId} onChange={(event) => { const selectedDay = days.find((day) => day.id === event.target.value); if (selectedDay) selectDayForReschedule(selectedDay); else setDayId(''); }}><option value="">Selecciona</option>{days.map((day) => <option key={day.id} value={day.id}>{weekdayName(day.weekday)} · {day.name}</option>)}</select></label>

@@ -9,6 +9,7 @@ import { useStateStore } from '../../stores/state.store';
 import { pushApi } from '../../pwa/push';
 import { isThisWeek, localDateKey } from '../../utils/dates';
 import { effectivePlanDaysForDate } from '../../utils/schedule';
+import { userFacingError } from '../../utils/user-facing-error';
 import { isMeasurementDue, reminderFor, snoozeOneWeek } from '../metrics/measurement-reminder';
 
 export function DashboardPage() {
@@ -63,7 +64,7 @@ export function DashboardPage() {
       });
       setWeight(''); setGoal(''); setWeightError(null); setShowWeightForm(false);
     } catch (cause) {
-      setWeightError(cause instanceof Error ? cause.message : 'No pudimos guardar la medición.');
+      setWeightError(userFacingError(cause, 'No pudimos guardar la medición. Inténtalo de nuevo.'));
     } finally {
       setWeightBusy(false);
     }
@@ -78,7 +79,7 @@ export function DashboardPage() {
       });
       if (navigator.onLine) await pushApi.syncMeasurementReminder();
     } catch (cause) {
-      setReminderError(cause instanceof Error ? cause.message : 'No pudimos aplazar el recordatorio.');
+      setReminderError(userFacingError(cause, 'No pudimos aplazar el recordatorio. Inténtalo de nuevo.'));
     } finally {
       setReminderBusy(false);
     }

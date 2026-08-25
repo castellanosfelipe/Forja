@@ -137,7 +137,7 @@ describe('state synchronization', () => {
   it('refuses a destructive refresh unless discarding pending data was explicitly confirmed', async () => {
     useStateStore.setState({ hasPendingChanges: true, status: 'conflict' });
 
-    await expect(useStateStore.getState().refresh()).rejects.toThrow('cambios locales pendientes');
+    await expect(useStateStore.getState().refresh()).rejects.toThrow('cambios por guardar en tu cuenta');
     expect(apiMocks.get).not.toHaveBeenCalled();
 
     apiMocks.get.mockResolvedValueOnce(state(2));

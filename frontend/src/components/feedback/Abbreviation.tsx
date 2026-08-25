@@ -38,21 +38,6 @@ const DEFINITIONS = {
     expanded: 'Tasa metabólica basal',
     description: 'Energía estimada que el cuerpo necesita en reposo para mantener sus funciones esenciales.',
   },
-  PWA: {
-    short: 'PWA',
-    expanded: 'Aplicación web progresiva',
-    description: 'Sitio web instalable que puede funcionar como una aplicación y conservar funciones sin conexión.',
-  },
-  JSON: {
-    short: 'JSON',
-    expanded: 'Notación de objetos de JavaScript',
-    description: 'Formato de texto estructurado usado por FORJA para almacenar los datos privados en el servidor autoalojado.',
-  },
-  PIN: {
-    short: 'PIN',
-    expanded: 'Número de identificación personal',
-    description: 'Código numérico privado que protege el acceso al dispositivo o a una credencial de seguridad.',
-  },
   REPS: {
     short: 'Reps',
     expanded: 'Repeticiones',

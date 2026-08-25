@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth.store';
 import { useStateStore } from '../../stores/state.store';
+import { userFacingError } from '../../utils/user-facing-error';
 import { PageSkeleton } from '../feedback/PageSkeleton';
 import { OnboardingWizard } from '../../features/onboarding/OnboardingWizard';
 import { ConfirmDialog } from '../feedback/ConfirmDialog';
@@ -35,6 +36,12 @@ export function AppShell() {
   const [replacingWithServer, setReplacingWithServer] = useState(false);
   const [replaceFailure, setReplaceFailure] = useState<string | null>(null);
   const previousPath = useRef(location.pathname);
+  const displayedError = error
+    ? userFacingError(
+        new Error(error),
+        'No pudimos guardar o recuperar tus datos. Inténtalo de nuevo.',
+      )
+    : null;
 
   useEffect(() => {
     void load();
@@ -60,11 +67,24 @@ export function AppShell() {
 
   function exportLocalCopy() {
     if (!state) return;
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const backup = {
+      savedAt: new Date().toISOString(),
+      preferences: state.preferences,
+      bodyWeight: state.bodyWeight,
+      bodyMetrics: state.bodyMetrics,
+      bodyMeasurementReminder: state.bodyMeasurementReminder,
+      onboarding: state.onboarding,
+      exerciseLibrary: state.exerciseLibrary,
+      weeklyPlan: state.weeklyPlan,
+      scheduleOverrides: state.scheduleOverrides,
+      workoutSessions: state.workoutSessions,
+      progression: state.progression,
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `forja-respaldo-local-${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `respaldo-forja-${new Date().toISOString().slice(0, 10)}.forja`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -75,8 +95,8 @@ export function AppShell() {
     try {
       await refresh({ discardPending: true });
       setConfirmUseServer(false);
-    } catch (cause) {
-      setReplaceFailure(cause instanceof Error ? cause.message : 'No pudimos obtener la versión del servidor.');
+    } catch {
+      setReplaceFailure('No pudimos recuperar los datos guardados en tu cuenta.');
     } finally {
       setReplacingWithServer(false);
     }
@@ -118,14 +138,14 @@ export function AppShell() {
         {state && (status === 'offline' || status === 'conflict' || error) && (
           <div className={`sync-banner ${status === 'conflict' ? 'conflict' : ''}`} role={status === 'conflict' || status === 'error' ? 'alert' : 'status'}>
             <WifiOff size={17} />
-            <span>{error ?? 'Trabajando sin conexión.'}</span>
+            <span>{displayedError ?? 'Trabajando sin conexión.'}</span>
             {navigator.onLine && hasPendingChanges && status !== 'conflict' && (
               <button type="button" onClick={() => void flush()}><RefreshCw size={15} /> Reintentar</button>
             )}
             {status === 'conflict' && <>
-              <button type="button" onClick={() => void flush()}><RefreshCw size={15} /> Reintentar combinación</button>
-              <button type="button" onClick={exportLocalCopy}><Download size={15} /> Descargar copia local</button>
-              <button type="button" onClick={() => { setReplaceFailure(null); setConfirmUseServer(true); }}>Usar versión del servidor</button>
+              <button type="button" onClick={() => void flush()}><RefreshCw size={15} /> Volver a intentar</button>
+              <button type="button" onClick={exportLocalCopy}><Download size={15} /> Guardar una copia</button>
+              <button type="button" onClick={() => { setReplaceFailure(null); setConfirmUseServer(true); }}>Descartar cambios de este dispositivo</button>
             </>}
             {error && <button type="button" className="icon-button" onClick={clearError} aria-label="Cerrar aviso">×</button>}
           </div>
@@ -138,7 +158,7 @@ export function AppShell() {
             <div className="empty-state" role="alert">
               <AlertTriangle size={36} aria-hidden="true" />
               <h1>No pudimos cargar tus datos</h1>
-              <p>{error ?? 'La aplicación no recibió un estado válido.'}</p>
+              <p>{displayedError ?? 'No pudimos recuperar tus datos. Inténtalo de nuevo.'}</p>
               <button className="primary-button" type="button" onClick={() => void load()}><RefreshCw size={17} /> Intentar de nuevo</button>
             </div>
           </main>
@@ -161,9 +181,9 @@ export function AppShell() {
       <OnboardingWizard open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
       <ConfirmDialog
         open={confirmUseServer}
-        title="¿Reemplazar la copia local?"
-        description={`Se descartarán los cambios que aún no se sincronizaron en este dispositivo. Descarga primero una copia local si quieres conservarlos.${replaceFailure ? ` No se pudo reemplazar: ${replaceFailure}` : ''}`}
-        confirmLabel="Descartar y usar servidor"
+        title="¿Descartar los cambios de este dispositivo?"
+        description={`Perderás los cambios que todavía no se guardaron en tu cuenta. Si quieres conservarlos, guarda una copia antes de continuar.${replaceFailure ? ` ${replaceFailure}` : ''}`}
+        confirmLabel="Descartar cambios y continuar"
         busy={replacingWithServer}
         onCancel={() => { setReplaceFailure(null); setConfirmUseServer(false); }}
         onConfirm={useServerVersion}

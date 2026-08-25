@@ -4,10 +4,10 @@ import { api } from '../api/client';
 export const pushApi = {
   async enable(): Promise<void> {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      throw new Error('Este navegador no admite Web Push.');
+      throw new Error('Este dispositivo no puede mostrar avisos cuando FORJA está cerrado.');
     }
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') throw new Error('Permiso de notificaciones denegado.');
+    if (permission !== 'granted') throw new Error('Los avisos están bloqueados. Permítelos en la configuración y vuelve a intentarlo.');
     const registration = await navigator.serviceWorker.ready;
     const { publicKey } = await api<{ publicKey: string }>('/api/push/vapid-public-key');
     const existing = await registration.pushManager.getSubscription();

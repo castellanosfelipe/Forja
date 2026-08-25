@@ -13,6 +13,7 @@ import type {
   TrainingGoal,
 } from '../../types/state';
 import { localDateKey } from '../../utils/dates';
+import { userFacingError } from '../../utils/user-facing-error';
 import { generateRoutine } from './routine-generator';
 import { Abbreviation } from '../../components/feedback/Abbreviation';
 import { Modal } from '../../components/feedback/Modal';
@@ -144,7 +145,7 @@ export function OnboardingWizard({ open = false, onClose }: OnboardingWizardProp
       });
       onClose?.();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No pudimos guardar tu rutina. Inténtalo de nuevo.');
+      setError(userFacingError(cause, 'No pudimos guardar tu rutina. Inténtalo de nuevo.'));
     } finally {
       setSaving(false);
     }
@@ -178,7 +179,7 @@ export function OnboardingWizard({ open = false, onClose }: OnboardingWizardProp
         {step === 4 && <EquipmentStep titleRef={titleRef} form={form} setForm={setForm} />}
         {step === 5 && <FocusStep titleRef={titleRef} form={form} setForm={setForm} />}
         {step === 6 && <ReviewStep titleRef={titleRef} form={form} setForm={setForm} replacingPlan={replacingPlan} />}
-        <p id="onboarding-help" className="onboarding-privacy"><ShieldCheck size={15} /> Tus respuestas se guardan únicamente en tu instancia autoalojada.</p>
+        <p id="onboarding-help" className="onboarding-privacy"><ShieldCheck size={15} /> Tus respuestas son privadas y solo se usan para preparar tu plan.</p>
         {error && <div className="error-banner onboarding-error" role="alert">{error}</div>}
         <footer className="onboarding-actions">
           <button className="secondary-button" type="button" disabled={step === 0 || saving} onClick={previous}><ArrowLeft size={17} /> Atrás</button>

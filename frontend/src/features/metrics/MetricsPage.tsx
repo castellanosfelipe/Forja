@@ -7,6 +7,7 @@ import { useStateStore } from '../../stores/state.store';
 import { pushApi } from '../../pwa/push';
 import type { ActivityLevel, BiologicalSex, BodyGoal, BodyMetricEntry, BodyMetricsProfile } from '../../types/state';
 import { formatDate } from '../../utils/dates';
+import { userFacingError } from '../../utils/user-facing-error';
 import { calculateBodyMetrics, type BodyMetricInput } from './calculations';
 import { addOneMonth, isMeasurementDue, reminderFor } from './measurement-reminder';
 
@@ -87,7 +88,7 @@ export function MetricsPage() {
     try {
       return { result: calculateBodyMetrics(toInput(form)), error: null };
     } catch (cause) {
-      return { result: null, error: cause instanceof Error ? cause.message : 'Revisa los valores.' };
+      return { result: null, error: userFacingError(cause, 'Revisa los valores.') };
     }
   }, [form]);
 
@@ -149,9 +150,9 @@ export function MetricsPage() {
       setForm((current) => ({ ...current, note: '' }));
       setNotice(result.bodyFatPercent !== null
         ? `Medición guardada. Te recordaremos repetir los perímetros el ${formatDate(addOneMonth(measuredAt))}.`
-        : 'Medición guardada y sincronizada con tu tendencia de peso.');
+        : 'Medición guardada y tendencia de peso actualizada.');
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No pudimos calcular las métricas.');
+      setError(userFacingError(cause, 'No pudimos guardar la medición. Revisa los valores e inténtalo de nuevo.'));
     } finally {
       setBusy(false);
     }
@@ -174,7 +175,7 @@ export function MetricsPage() {
       setMeasurementToRemove(null);
       setNotice('Medición eliminada del historial corporal y de la tendencia de peso asociada.');
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No pudimos eliminar la medición.');
+      setError(userFacingError(cause, 'No pudimos eliminar la medición. Inténtalo de nuevo.'));
     } finally {
       setBusy(false);
     }

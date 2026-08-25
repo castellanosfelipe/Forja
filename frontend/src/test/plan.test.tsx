@@ -85,7 +85,8 @@ describe('PlanPage interaction and scheduling', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Ejercicio' }), 'bench-press');
     await user.click(screen.getByRole('button', { name: 'Añadir al plan' }));
 
-    expect((await screen.findByRole('alert')).textContent).toContain('No pudimos añadir el ejercicio al plan. Almacenamiento no disponible.');
+    expect((await screen.findByRole('alert')).textContent).toContain('No pudimos añadir el ejercicio al plan.');
+    expect(screen.getByRole('alert').textContent).not.toContain('Almacenamiento');
     expect(screen.getByRole('button', { name: 'Añadir al plan' })).toHaveProperty('disabled', false);
   });
 });

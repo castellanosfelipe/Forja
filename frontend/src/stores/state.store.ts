@@ -3,6 +3,7 @@ import { ApiError } from '../api/client';
 import { stateApi } from '../api/state.api';
 import { deleteOfflineValue, readOfflineValue, writeOfflineValue } from '../pwa/offline-db';
 import type { SyncStatus, UserState } from '../types/state';
+import { userFacingError } from '../utils/user-facing-error';
 import { useAuthStore } from './auth.store';
 
 function offlineKeys() {
@@ -62,7 +63,7 @@ export const useStateStore = create<StateStore>((set, get) => ({
       }
     } catch (cause) {
       if (cached) {
-        set({ status: 'offline', error: 'Modo sin conexión: los cambios se sincronizarán automáticamente.' });
+        set({ status: 'offline', error: 'No tienes conexión. Puedes seguir usando FORJA y guardaremos tus cambios cuando vuelvas.' });
       } else {
         set({ status: 'error', error: errorMessage(cause) });
       }
@@ -75,7 +76,7 @@ export const useStateStore = create<StateStore>((set, get) => ({
     const keys = offlineKeys();
     const pending = await readOfflineValue<UserState>(keys.pending).catch(() => null);
     if (!options.discardPending && (get().hasPendingChanges || pending)) {
-      throw new Error('Hay cambios locales pendientes. Sincronízalos o exporta una copia antes de recargar desde el servidor.');
+      throw new Error('Aún hay cambios por guardar en tu cuenta. Espera a que terminen o guarda una copia antes de continuar.');
     }
     const remote = await stateApi.get();
     await Promise.all([
@@ -157,7 +158,7 @@ async function flushPending(keys: OfflineKeys, set: StoreSetter, get: StoreGette
     if (!rebased) {
       set({
         status: 'conflict',
-        error: 'Otro dispositivo cambió los mismos datos. Conservamos tu versión local; descarga una copia o decide cuál versión mantener.',
+        error: 'Tus cambios y los de otro dispositivo no coinciden. Nada se ha borrado: guarda una copia o elige qué información conservar.',
         hasPendingChanges: true,
       });
       return;
@@ -176,7 +177,7 @@ async function flushPending(keys: OfflineKeys, set: StoreSetter, get: StoreGette
     if (cause instanceof ApiError && cause.status === 409) {
       set({
         status: 'conflict',
-        error: 'Los datos volvieron a cambiar mientras sincronizábamos. Tu copia local permanece intacta.',
+        error: 'Tu información cambió otra vez en otro dispositivo. Tus cambios siguen a salvo aquí.',
         hasPendingChanges: true,
       });
       return;
@@ -198,7 +199,7 @@ function setSyncFailure(cause: unknown, set: StoreSetter): void {
   if (cause instanceof ApiError && cause.status === 401) {
     set({
       status: 'error',
-      error: 'Tu sesión expiró. Tus cambios siguen guardados en este dispositivo; inicia sesión de nuevo para sincronizarlos.',
+      error: 'Por seguridad, vuelve a iniciar sesión. Tus cambios siguen a salvo en este dispositivo y se guardarán en tu cuenta cuando entres.',
       hasPendingChanges: true,
     });
     return;
@@ -206,14 +207,14 @@ function setSyncFailure(cause: unknown, set: StoreSetter): void {
   if (cause instanceof ApiError && cause.status === 413) {
     set({
       status: 'error',
-      error: 'Tus datos superan el tamaño admitido por el servidor. La copia local está protegida; exporta un respaldo antes de continuar.',
+      error: 'Has alcanzado el límite de información que puede guardarse en tu cuenta. Tus cambios siguen a salvo aquí; guarda una copia antes de continuar.',
       hasPendingChanges: true,
     });
     return;
   }
   set({
     status: 'offline',
-    error: 'Sin conexión. Conservamos los cambios en este dispositivo.',
+    error: 'Sin conexión. Tus cambios siguen a salvo y se guardarán cuando vuelvas a conectarte.',
     hasPendingChanges: true,
   });
 }
@@ -273,5 +274,5 @@ function deepEqual(left: unknown, right: unknown): boolean {
 }
 
 function errorMessage(cause: unknown): string {
-  return cause instanceof Error ? cause.message : 'No pudimos cargar tus datos.';
+  return userFacingError(cause, 'No pudimos cargar tus datos. Revisa tu conexión e inténtalo de nuevo.');
 }

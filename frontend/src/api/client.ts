@@ -41,7 +41,7 @@ export async function api<T>(
     throw new ApiError(
       response.status,
       payload.error?.code ?? 'REQUEST_FAILED',
-      payload.error?.message ?? `La solicitud falló (${response.status})`,
+      payload.error?.message ?? 'No pudimos completar la acción. Inténtalo de nuevo.',
     );
   }
   if (response.status === 204) return undefined as T;

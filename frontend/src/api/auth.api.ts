@@ -37,9 +37,10 @@ export const authApi = {
   },
 
   async loginPasskey(username?: string): Promise<AuthUser> {
+    const normalizedUsername = username?.trim();
     const options = await api<PublicKeyCredentialRequestOptionsJSON>('/api/auth/login/options', {
       method: 'POST',
-      json: username ? { username } : {},
+      json: normalizedUsername ? { username: normalizedUsername } : {},
     });
     const credential = await startAuthentication({ optionsJSON: options });
     const result = await api<{ verified: true; user: AuthUser }>('/api/auth/login/verify', {

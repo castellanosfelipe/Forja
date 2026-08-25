@@ -11,7 +11,7 @@ function openDatabase(): Promise<IDBDatabase> {
       }
     };
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error ?? new Error('No se pudo abrir IndexedDB'));
+    request.onerror = () => reject(new Error('No pudimos abrir los datos guardados en este dispositivo.'));
   });
 }
 
@@ -21,7 +21,7 @@ export async function readOfflineValue<T>(key: string): Promise<T | null> {
     const transaction = database.transaction(STORE_NAME, 'readonly');
     const request = transaction.objectStore(STORE_NAME).get(key);
     request.onsuccess = () => resolve((request.result as T | undefined) ?? null);
-    request.onerror = () => reject(request.error ?? new Error('No se pudo leer IndexedDB'));
+    request.onerror = () => reject(new Error('No pudimos leer los datos guardados en este dispositivo.'));
     transaction.oncomplete = () => database.close();
   });
 }
@@ -35,7 +35,7 @@ export async function writeOfflineValue<T>(key: string, value: T): Promise<void>
       database.close();
       resolve();
     };
-    transaction.onerror = () => reject(transaction.error ?? new Error('No se pudo guardar en IndexedDB'));
+    transaction.onerror = () => reject(new Error('No pudimos guardar tus cambios en este dispositivo.'));
   });
 }
 
@@ -48,6 +48,6 @@ export async function deleteOfflineValue(key: string): Promise<void> {
       database.close();
       resolve();
     };
-    transaction.onerror = () => reject(transaction.error ?? new Error('No se pudo eliminar de IndexedDB'));
+    transaction.onerror = () => reject(new Error('No pudimos retirar los datos guardados en este dispositivo.'));
   });
 }
