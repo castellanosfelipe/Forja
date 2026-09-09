@@ -4,7 +4,7 @@ import { useStateStore } from '../../stores/state.store';
 import type { Exercise, ProgressionStrategy } from '../../types/state';
 import { EXERCISE_CATEGORIES, exerciseCategory } from './exercise-categories';
 import { MuscleMultiSelect } from './MuscleMultiSelect';
-import { ExerciseAnimation } from './ExerciseAnimation';
+import { ExerciseMedia } from './ExerciseMedia';
 import { ExerciseGuideDialog } from './ExerciseGuideDialog';
 
 const PAGE_SIZE = 24;
@@ -144,7 +144,7 @@ export function LibraryPage() {
           <div className="exercise-grid">
             {categoryExercises.map((exercise) => {
               const rule = state.progression.exerciseRules.find((candidate) => candidate.exerciseId === exercise.id);
-              return <article className="exercise-card" key={exercise.id}><button className="exercise-media-button" type="button" onClick={() => setGuideExercise(exercise)} aria-label={`Abrir guía orientativa de ${exercise.name}`}><ExerciseAnimation exercise={exercise} compact /><span><Eye size={15} /> Guía orientativa</span></button><div className="exercise-body"><p>{category.shortLabel}</p><h3>{exercise.name}</h3><div className="tag-row">{exercise.isBodyweight && <span>Peso corporal</span>}{exercise.isPerSide && <span>Por lado</span>}{exercise.equipment.slice(0, 2).map((item) => <span key={item}>{item}</span>)}{exercise.equipment.length === 0 && !exercise.isBodyweight && <span>Sin equipo</span>}</div></div><div className="exercise-meta"><span><Sparkles size={15} /> {progressionLabel(rule?.strategy)}</span><strong>{rule ? `${rule.state.nextLoadKg} kg` : exercise.measurement === 'duration' ? 'Tiempo' : 'Libre'}</strong><small>{rule ? 'próxima carga' : 'al añadir al plan'}</small></div></article>;
+              return <article className="exercise-card" key={exercise.id}><button className="exercise-media-button" type="button" onClick={() => setGuideExercise(exercise)} aria-label={`Abrir guía visual de ${exercise.name}`}><ExerciseMedia exercise={exercise} compact /><span><Eye size={15} /> Ver técnica</span></button><div className="exercise-body"><p>{category.shortLabel}</p><h3>{exercise.name}</h3><div className="tag-row">{exercise.isBodyweight && <span>Peso corporal</span>}{exercise.isPerSide && <span>Por lado</span>}{exercise.equipment.slice(0, 2).map((item) => <span key={item}>{item}</span>)}{exercise.equipment.length === 0 && !exercise.isBodyweight && <span>Sin equipo</span>}</div></div><div className="exercise-meta"><span><Sparkles size={15} /> {progressionLabel(rule?.strategy)}</span><strong>{rule ? `${rule.state.nextLoadKg} kg` : exercise.measurement === 'duration' ? 'Tiempo' : 'Libre'}</strong><small>{rule ? 'próxima carga' : 'al añadir al plan'}</small></div></article>;
             })}
           </div>
         </section>

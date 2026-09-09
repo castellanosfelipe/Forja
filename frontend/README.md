@@ -18,6 +18,8 @@ Vite publica `http://localhost:5173` y reenvía `/api` al backend local en `http
 - Service Worker escrito directamente con las API del navegador.
 - Aplicación instalable con manifiesto e iconos normal/maskable.
 - Cache del shell; las respuestas privadas `/api` nunca se guardan en Cache Storage.
+- Registro visual exacto para los 195 ejercicios base, con imágenes autoalojadas y sin GIF ni coincidencias difusas.
+- Caché independiente de demostraciones: cada guía consultada queda disponible sin conexión después de su primera carga.
 - Estado offline y cambios pendientes en IndexedDB, aislados por ID de usuario.
 - Web Push para avisos de descanso cuando la pestaña está oculta.
 - Calculadoras encadenadas de IMC, grasa corporal, TMB/TDEE, macronutrientes, masa magra y FFMI con historial persistente.
@@ -37,4 +39,10 @@ Vite publica `http://localhost:5173` y reenvía `/api` al backend local en `http
 npm run typecheck
 npm test
 npm run build
+```
+
+El registro versionado está en `src/features/exercises/media/registry.json`. Para reconstruirlo desde las revisiones documentadas de RepDB y Free Exercise DB, coloca ambos repositorios en `work/vendor/` y ejecuta desde la raíz:
+
+```bash
+backend/node_modules/.bin/tsx scripts/build-exercise-media.ts
 ```

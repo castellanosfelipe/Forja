@@ -1,15 +1,17 @@
-const CACHE = 'forja-shell-v2';
+const SHELL_CACHE = 'forja-shell-v3';
+const MEDIA_CACHE = 'forja-exercise-media-v1';
+const ACTIVE_CACHES = new Set([SHELL_CACHE, MEDIA_CACHE]);
 const SHELL = ['/', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL)));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => !ACTIVE_CACHES.has(key)).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
@@ -24,10 +26,23 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put('/', copy));
+          caches.open(SHELL_CACHE).then((cache) => cache.put('/', copy));
           return response;
         })
         .catch(() => caches.match('/')),
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith('/exercise-media/')) {
+    event.respondWith(
+      caches.open(MEDIA_CACHE).then(async (cache) => {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        const response = await fetch(request);
+        if (response.ok) await cache.put(request, response.clone());
+        return response;
+      }),
     );
     return;
   }
@@ -36,7 +51,7 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => cached || fetch(request).then((response) => {
       if (response.ok && ['script', 'style', 'font', 'image'].includes(request.destination)) {
         const copy = response.clone();
-        caches.open(CACHE).then((cache) => cache.put(request, copy));
+        caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy));
       }
       return response;
     })),

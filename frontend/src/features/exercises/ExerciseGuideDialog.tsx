@@ -1,19 +1,22 @@
-import { AlertTriangle, CheckCircle2, Pause, Play, Wind, X } from 'lucide-react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { AlertTriangle, CheckCircle2, Wind, X } from 'lucide-react';
+import { useId, useRef } from 'react';
 import { Modal } from '../../components/feedback/Modal';
 import type { Exercise } from '../../types/state';
-import { ExerciseAnimation } from './ExerciseAnimation';
+import { ExerciseMedia } from './ExerciseMedia';
 import { getExerciseGuide } from './exercise-guide';
+import { getExerciseMedia } from './media/exercise-media';
 
 export function ExerciseGuideDialog({ exercise, open, onClose }: { exercise: Exercise | null; open: boolean; onClose(): void }) {
   const closeButton = useRef<HTMLButtonElement>(null);
   const titleId = useId();
-  const [paused, setPaused] = useState(false);
-
-  useEffect(() => { setPaused(false); }, [exercise?.id, open]);
 
   if (!exercise) return null;
   const guide = getExerciseGuide(exercise);
+  const media = getExerciseMedia(exercise.id);
+  const steps = media?.instructions.length
+    ? media.instructions.map((description, index) => ({ title: `Paso ${index + 1}`, description }))
+    : guide.steps;
+  const cues = media?.tips.length ? media.tips : guide.cues;
   return (
     <Modal
       open={open}
@@ -29,18 +32,17 @@ export function ExerciseGuideDialog({ exercise, open, onClose }: { exercise: Exe
       </header>
       <div className="exercise-guide-layout">
         <div className="guide-visual-panel">
-          <ExerciseAnimation exercise={exercise} paused={paused} />
-          <div className="guide-animation-controls">
-            <p><strong>Referencia orientativa:</strong> muestra una familia de movimiento genérica, no una demostración verificada de este ejercicio exacto.</p>
-            <button className="secondary-button" type="button" aria-pressed={paused} onClick={() => setPaused((value) => !value)}>
-              {paused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
-              {paused ? 'Reproducir' : 'Pausar'}
-            </button>
+          <ExerciseMedia exercise={exercise} />
+          <div className="guide-media-note">
+            {media
+              ? <p><strong>Demostración del ejercicio:</strong> compara cada posición antes de comenzar la serie.</p>
+              : <p><strong>Ejercicio personalizado:</strong> todavía no cuenta con una demostración visual verificada.</p>}
+            {media?.description && <p>{media.description}</p>}
           </div>
         </div>
         <div className="guide-instructions">
-          <ol>{guide.steps.map((step, index) => <li key={step.title}><span>{index + 1}</span><div><strong>{step.title}</strong><p>{step.description}</p></div></li>)}</ol>
-          <section className="technique-cues"><h3>Señales clave</h3><div>{guide.cues.map((cue) => <span key={cue}><CheckCircle2 /> {cue}</span>)}</div></section>
+          <ol>{steps.map((step, index) => <li key={`${index}-${step.title}`}><span>{index + 1}</span><div><strong>{step.title}</strong><p>{step.description}</p></div></li>)}</ol>
+          <section className="technique-cues"><h3>Señales clave</h3><div>{cues.map((cue) => <span key={cue}><CheckCircle2 /> {cue}</span>)}</div></section>
           <div className="breathing-cue"><Wind /><div><strong>Respiración</strong><p>{guide.breathing}</p></div></div>
           <div className="safety-cue"><AlertTriangle /><div><strong>Evita</strong><p>{guide.warning}</p></div></div>
         </div>

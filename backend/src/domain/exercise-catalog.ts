@@ -246,7 +246,7 @@ export const GYM_EXERCISE_CATALOG: Exercise[] = [
   // Movilidad y recuperación
   e('worlds-greatest-stretch', 'Estiramiento del corredor con rotación', 'mobility', ['colchoneta'], ['hip-flexors', 'thoracic-spine'], { bodyweight: true, perSide: true, duration: true }),
   e('hip-flexor-stretch', 'Estiramiento de flexores de cadera', 'mobility', ['colchoneta'], ['hip-flexors'], { bodyweight: true, perSide: true, duration: true }),
-  e('hamstring-stretch', 'Estiramiento de isquiotibiales', 'mobility', ['colchoneta'], ['hamstrings'], { bodyweight: true, perSide: true, duration: true }),
+  e('hamstring-stretch', 'Estiramiento de isquiotibiales', 'mobility', ['colchoneta', 'banda o correa'], ['hamstrings'], { bodyweight: true, perSide: true, duration: true }),
   e('quadriceps-stretch', 'Estiramiento de cuádriceps', 'mobility', [], ['quadriceps'], { bodyweight: true, perSide: true, duration: true }),
   e('calf-stretch', 'Estiramiento de pantorrilla', 'mobility', ['pared'], ['calves'], { bodyweight: true, perSide: true, duration: true }),
   e('pec-doorway-stretch', 'Estiramiento de pecho en marco', 'mobility', ['marco o rack'], ['pectoralis-major'], { bodyweight: true, perSide: true, duration: true }),

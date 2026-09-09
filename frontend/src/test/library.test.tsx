@@ -15,7 +15,7 @@ describe('categorized exercise library', () => {
 
     expect(screen.getByRole('heading', { name: 'Pecho' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Espalda' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Abrir guía orientativa de Press de banca con barra' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Abrir guía visual de Press de banca con barra' })).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Filtrar por Espalda: 1 ejercicios' }));
     expect(screen.queryByText('Press de banca con barra')).toBeNull();
     expect(screen.getByText('Remo sentado en polea')).toBeTruthy();
@@ -25,21 +25,21 @@ describe('categorized exercise library', () => {
     expect(screen.getByText('Remo sentado en polea')).toBeTruthy();
   });
 
-  it('opens an explicitly orientative step-by-step guide for every exercise card', async () => {
+  it('opens the exact visual and step-by-step guide for a catalog exercise', async () => {
     const user = userEvent.setup();
     useStateStore.setState({ state: fixture() });
     render(<LibraryPage />);
 
-    await user.click(screen.getByRole('button', { name: 'Abrir guía orientativa de Press de banca con barra' }));
+    await user.click(screen.getByRole('button', { name: 'Abrir guía visual de Press de banca con barra' }));
     const dialog = screen.getByRole('dialog', { name: 'Press de banca con barra' });
 
-    expect(within(dialog).getByRole('img', { name: 'Ilustración orientativa de Press de banca con barra' })).toBeTruthy();
+    expect(within(dialog).getByRole('img', { name: 'Press de banca con barra: inicio' })).toBeTruthy();
+    expect(within(dialog).getByRole('img', { name: 'Press de banca con barra: punto clave' })).toBeTruthy();
+    expect(within(dialog).getByText('Demostración del ejercicio:')).toBeTruthy();
     expect(within(dialog).getByText('Respiración')).toBeTruthy();
     expect(within(dialog).getByText('Evita')).toBeTruthy();
-    expect(within(dialog).getAllByRole('listitem')).toHaveLength(3);
-    const pause = within(dialog).getByRole('button', { name: 'Pausar' });
-    await user.click(pause);
-    expect(within(dialog).getByRole('button', { name: 'Reproducir' }).getAttribute('aria-pressed')).toBe('true');
+    expect(within(dialog).getAllByRole('listitem')).toHaveLength(5);
+    expect(within(dialog).queryByRole('button', { name: 'Pausar' })).toBeNull();
     await user.click(within(dialog).getByRole('button', { name: 'Entendido' }));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -65,6 +65,24 @@ describe('categorized exercise library', () => {
     expect(within(secondaryField).getByRole('checkbox', { name: 'Tríceps' })).toBeTruthy();
   });
 
+  it('does not invent a visual for a custom exercise without verified media', async () => {
+    const user = userEvent.setup();
+    const value = fixture();
+    value.exerciseLibrary = [{
+      ...value.exerciseLibrary[0]!,
+      id: 'press-personalizado',
+      name: 'Press personalizado',
+    }];
+    useStateStore.setState({ state: value });
+    render(<LibraryPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Abrir guía visual de Press personalizado' }));
+    const dialog = screen.getByRole('dialog', { name: 'Press personalizado' });
+    expect(within(dialog).getByText('Sin demostración verificada')).toBeTruthy();
+    expect(within(dialog).getByText('Ejercicio personalizado:')).toBeTruthy();
+    expect(within(dialog).queryByRole('img')).toBeNull();
+  });
+
   it('renders the large catalog progressively instead of mounting every animation', async () => {
     const user = userEvent.setup();
     const value = fixture();
@@ -77,9 +95,9 @@ describe('categorized exercise library', () => {
     useStateStore.setState({ state: value });
     render(<LibraryPage />);
 
-    expect(screen.getAllByRole('button', { name: /Abrir guía orientativa de/ })).toHaveLength(24);
+    expect(screen.getAllByRole('button', { name: /Abrir guía visual de/ })).toHaveLength(24);
     await user.click(screen.getByRole('button', { name: 'Mostrar 6 ejercicios más' }));
-    expect(screen.getAllByRole('button', { name: /Abrir guía orientativa de/ })).toHaveLength(30);
+    expect(screen.getAllByRole('button', { name: /Abrir guía visual de/ })).toHaveLength(30);
   });
 });
 
