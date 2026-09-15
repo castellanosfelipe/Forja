@@ -14,6 +14,11 @@ const base: BodyMetricInput = {
 };
 
 describe('calculadoras corporales', () => {
+  it('rejects a calorie budget that cannot accommodate its own macronutrient allocation', () => {
+    expect(() => calculateBodyMetrics({ ...base, sex: 'female', ageYears: 100, heightCm: 100, weightKg: 20, activityLevel: 'sedentary', goal: 'lose', neckCm: null, waistCm: null }))
+      .toThrow('energía calculada');
+  });
+
   it('encadena IMC, grasa, energía y macros con valores reproducibles', () => {
     const result = calculateBodyMetrics(base);
 

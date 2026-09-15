@@ -5,8 +5,12 @@ import type { Exercise } from '../../types/state';
 import { ExerciseMedia } from './ExerciseMedia';
 import { getExerciseGuide } from './exercise-guide';
 import { getExerciseMedia } from './media/exercise-media';
+import { CustomGuideEditor } from './CustomGuideEditor';
+import { useStateStore } from '../../stores/state.store';
 
-export function ExerciseGuideDialog({ exercise, open, onClose }: { exercise: Exercise | null; open: boolean; onClose(): void }) {
+export function ExerciseGuideDialog({ exercise: selectedExercise, open, onClose }: { exercise: Exercise | null; open: boolean; onClose(): void }) {
+  const savedExercise = useStateStore((store) => store.state?.exerciseLibrary.find((item) => item.id === selectedExercise?.id));
+  const exercise = savedExercise ?? selectedExercise;
   const closeButton = useRef<HTMLButtonElement>(null);
   const titleId = useId();
 
@@ -34,11 +38,14 @@ export function ExerciseGuideDialog({ exercise, open, onClose }: { exercise: Exe
         <div className="guide-visual-panel">
           <ExerciseMedia exercise={exercise} />
           <div className="guide-media-note">
-            {media
+            {exercise.guideMedia
+              ? <p><strong>Tu referencia visual:</strong> imagen añadida por ti. Confirma la técnica con un profesional si tienes dudas.</p>
+              : media
               ? <p><strong>Demostración del ejercicio:</strong> compara cada posición antes de comenzar la serie.</p>
               : <p><strong>Ejercicio personalizado:</strong> todavía no cuenta con una demostración visual verificada.</p>}
             {media?.description && <p>{media.description}</p>}
           </div>
+          {!media && <CustomGuideEditor key={exercise.id} exercise={exercise} />}
         </div>
         <div className="guide-instructions">
           <ol>{steps.map((step, index) => <li key={`${index}-${step.title}`}><span>{index + 1}</span><div><strong>{step.title}</strong><p>{step.description}</p></div></li>)}</ol>

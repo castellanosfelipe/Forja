@@ -1,0 +1,4040 @@
+{
+  "executedAt": "2026-09-15T13:45:55.644Z",
+  "baselineCommit": "acda8d39f379a8f1c60956b3be14022eeb692770",
+  "environment": {
+    "node": "v24.21.0",
+    "dataDir": "C:\\Users\\bpena\\Documents\\Codex\\2026-08-24\\rol-y-objetivo-act-as-como\\work\\remediation\\backend\\run-1789479950365",
+    "transport": "HTTP loopback, production origin enforcement",
+    "vapid": false,
+    "authenticator": "local ECDSA P-256, attestation none"
+  },
+  "counts": {
+    "PASS": 125,
+    "FAIL": 0,
+    "BLOCKED": 3,
+    "NOT TESTED": 3,
+    "NOT APPLICABLE": 1
+  },
+  "cases": [
+    {
+      "id": "API-001",
+      "module": "HTTP",
+      "scenario": "GET /api/health público",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "status": "ok",
+          "service": "forja-web-backend",
+          "uptimeSeconds": 2,
+          "timestamp": "2026-09-15T13:45:50.427Z"
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 31.12
+      },
+      "evidence": {
+        "request": "GET /api/health público",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-002",
+      "module": "Auth",
+      "scenario": "GET /api/auth/session anónimo",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "authenticated": false,
+          "user": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 7.18
+      },
+      "evidence": {
+        "request": "GET /api/auth/session anónimo",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-003",
+      "module": "Authorization",
+      "scenario": "GET /api/state sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "a99b4826-e08a-426c-80e7-7ba62cbae30c"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 6.83
+      },
+      "evidence": {
+        "request": "GET /api/state sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-004",
+      "module": "Authorization",
+      "scenario": "PUT /api/state sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "72d1ce1c-89c8-43e7-8120-2e4ccb70f0b2"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 10.28
+      },
+      "evidence": {
+        "request": "PUT /api/state sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-005",
+      "module": "Authorization",
+      "scenario": "POST /api/body-weight sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "dd29bbd3-ad0d-40ab-9f51-f0e7bffd51b7"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.82
+      },
+      "evidence": {
+        "request": "POST /api/body-weight sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-006",
+      "module": "Authorization",
+      "scenario": "DELETE /api/body-weight/unknown sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "ed392cbc-032b-4ecb-9fdc-2287915980d4"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.23
+      },
+      "evidence": {
+        "request": "DELETE /api/body-weight/unknown sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-007",
+      "module": "Authorization",
+      "scenario": "GET /api/workouts/previous/back-squat sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "e1d2fbe3-3dbc-49df-ba7c-34658bb27973"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.1
+      },
+      "evidence": {
+        "request": "GET /api/workouts/previous/back-squat sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-008",
+      "module": "Authorization",
+      "scenario": "POST /api/workouts sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "fa72eda8-9676-43ef-9601-77c559174415"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.09
+      },
+      "evidence": {
+        "request": "POST /api/workouts sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-009",
+      "module": "Authorization",
+      "scenario": "PATCH /api/workouts/unknown sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "a3065f74-0290-4716-b2ed-91a887c511d8"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 6.45
+      },
+      "evidence": {
+        "request": "PATCH /api/workouts/unknown sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-010",
+      "module": "Authorization",
+      "scenario": "POST /api/workouts/unknown/complete sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "fa5b127e-fee4-4b86-8981-2b7bc37ea333"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 3.91
+      },
+      "evidence": {
+        "request": "POST /api/workouts/unknown/complete sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-011",
+      "module": "Authorization",
+      "scenario": "POST /api/workouts/unknown/cancel sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "9ea701ca-0066-434c-b75b-eba6fa91bcb8"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.26
+      },
+      "evidence": {
+        "request": "POST /api/workouts/unknown/cancel sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-012",
+      "module": "Authorization",
+      "scenario": "GET /api/auth/passkeys sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "0ac3d63b-b5d1-4b27-913d-bf36e3e1cb90"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 4.71
+      },
+      "evidence": {
+        "request": "GET /api/auth/passkeys sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-013",
+      "module": "Authorization",
+      "scenario": "DELETE /api/auth/passkeys/unknown sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "d8f6c585-98b0-4d54-9dcc-4d671eaa8729"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.65
+      },
+      "evidence": {
+        "request": "DELETE /api/auth/passkeys/unknown sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-014",
+      "module": "Authorization",
+      "scenario": "GET /api/push/vapid-public-key sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "c8ab2036-e02d-482e-a0db-8cbf42a56adf"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.03
+      },
+      "evidence": {
+        "request": "GET /api/push/vapid-public-key sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-015",
+      "module": "Authorization",
+      "scenario": "POST /api/push/subscriptions sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "926ee2a5-fcdd-44a7-b819-6ed75fa01eb7"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.12
+      },
+      "evidence": {
+        "request": "POST /api/push/subscriptions sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-016",
+      "module": "Authorization",
+      "scenario": "DELETE /api/push/subscriptions/unknown sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "0aff9100-19f8-4aef-bee8-3083ace8a470"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 3.44
+      },
+      "evidence": {
+        "request": "DELETE /api/push/subscriptions/unknown sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-017",
+      "module": "Authorization",
+      "scenario": "POST /api/push/rest-timers sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "c0d47921-63ad-4cb2-a255-6bb50ee1fd18"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.02
+      },
+      "evidence": {
+        "request": "POST /api/push/rest-timers sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-018",
+      "module": "Authorization",
+      "scenario": "DELETE /api/push/rest-timers/unknown sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "4cb4ac7a-1514-4142-a94c-6d27cde77a97"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.78
+      },
+      "evidence": {
+        "request": "DELETE /api/push/rest-timers/unknown sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-019",
+      "module": "Authorization",
+      "scenario": "POST /api/push/body-measurement-reminder/sync sin sesión",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "bb71f733-08c8-4948-99f3-2295d8631ffd"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.91
+      },
+      "evidence": {
+        "request": "POST /api/push/body-measurement-reminder/sync sin sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-020",
+      "module": "HTTP",
+      "scenario": "POST login con text/plain",
+      "status": "PASS",
+      "expected": "HTTP 415",
+      "observed": {
+        "status": 415,
+        "body": {
+          "error": {
+            "code": "UNSUPPORTED_MEDIA_TYPE",
+            "message": "Content-Type must be application/json",
+            "requestId": "c5036311-ed75-4314-822c-78729f33ac6f"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 4.31
+      },
+      "evidence": {
+        "request": "POST login con text/plain",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-021",
+      "module": "HTTP",
+      "scenario": "POST login JSON inválido",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "Request body contains invalid JSON",
+            "requestId": "1e85364b-107d-4a89-9094-10ef8c46fa5c"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.55
+      },
+      "evidence": {
+        "request": "POST login JSON inválido",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-022",
+      "module": "Validation",
+      "scenario": "Registro inválido null",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "Request body must be a JSON object",
+            "requestId": "e41d0a53-3b76-4f15-b5cb-1b530756c5a0"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.42
+      },
+      "evidence": {
+        "request": "Registro inválido null",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-023",
+      "module": "Validation",
+      "scenario": "Registro inválido []",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "Request body must be a JSON object",
+            "requestId": "d075e0a1-6357-4d3f-be5e-32057d487bb2"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.5
+      },
+      "evidence": {
+        "request": "Registro inválido []",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-024",
+      "module": "Validation",
+      "scenario": "Registro inválido {}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "username must be a string",
+            "requestId": "0b6017b6-55fc-464e-8128-fb878f3a1f26"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.84
+      },
+      "evidence": {
+        "request": "Registro inválido {}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-025",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":123,\"password\":\"<test-value-redacted>\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "username must be a string",
+            "requestId": "4064fe49-9e96-425a-82fe-1ea5bc70aea1"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.45
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":123,\"password\":\"<test-value-redacted>\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-026",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":\"qa-user\",\"password\":12}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "password must be a string",
+            "requestId": "171235b9-41df-4f93-bc57-5c8b05539096"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.75
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":\"qa-user\",\"password\":12}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-027",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":\"../user\",\"password\":\"<test-value-redacted>\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "username must be 3-64 characters using letters, numbers, dot, underscore, or hyphen",
+            "requestId": "9aa8d7ed-698e-4a40-925a-191c09f8dba8"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.42
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":\"../user\",\"password\":\"<test-value-redacted>\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-028",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":\"ñandú\",\"password\":\"<test-value-redacted>\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "username must be 3-64 characters using letters, numbers, dot, underscore, or hyphen",
+            "requestId": "388a6a8b-864e-4adc-8300-32d01a7ba89d"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.44
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":\"ñandú\",\"password\":\"<test-value-redacted>\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-029",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":\"qa-user\",\"password\":\"<test-value-redacted>\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "La contraseña debe tener al menos 10 caracteres",
+            "requestId": "4ceaf083-a079-4464-bd65-6d9b3f01c7da"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.49
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":\"qa-user\",\"password\":\"<test-value-redacted>\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-030",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"password\":\"<test-value-redacted>\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "username is too long",
+            "requestId": "230a394c-64ed-4967-a736-2f99cef73e0b"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.38
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"password\":\"<test-value-redacted>\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-031",
+      "module": "Validation",
+      "scenario": "Registro inválido {\"username\":\"qa-user\",\"password\":\"<test-value-redacted>\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "La contraseña es demasiado larga",
+            "requestId": "893b0633-0c07-4c20-842a-f475ac8b8bf2"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.45
+      },
+      "evidence": {
+        "request": "Registro inválido {\"username\":\"qa-user\",\"password\":\"<test-value-redacted>\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-032",
+      "module": "CSRF",
+      "scenario": "POST origin ajeno",
+      "status": "PASS",
+      "expected": "HTTP 403",
+      "observed": {
+        "status": 403,
+        "body": {
+          "error": {
+            "code": "FORBIDDEN",
+            "message": "Cross-origin requests are not allowed",
+            "requestId": "23c6cd4e-11c7-427c-80c2-eb9303a4b6c2"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.92
+      },
+      "evidence": {
+        "request": "POST origin ajeno",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-033",
+      "module": "CSRF",
+      "scenario": "POST producción sin Origin",
+      "status": "PASS",
+      "expected": "HTTP 403",
+      "observed": {
+        "status": 403,
+        "body": {
+          "error": {
+            "code": "FORBIDDEN",
+            "message": "Origin header is required",
+            "requestId": "0e29a207-88f1-4070-aa6b-f26be5c26755"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 3.87
+      },
+      "evidence": {
+        "request": "POST producción sin Origin",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-034",
+      "module": "Auth",
+      "scenario": "Registro con usuario y contraseña",
+      "status": "PASS",
+      "expected": "HTTP 201 y contrato esperado",
+      "observed": {
+        "status": 201,
+        "body": {
+          "user": {
+            "id": "491d0d75-de3d-4c34-a7b7-de5ba071eea1",
+            "username": "qa-alice",
+            "displayName": "qa-alice",
+            "createdAt": "2026-09-15T13:45:50.571Z",
+            "passkeys": [],
+            "passwordEnabled": true
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_session=<redacted>; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 136.62
+      },
+      "evidence": {
+        "request": "Registro con usuario y contraseña",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-035",
+      "module": "Auth",
+      "scenario": "Cookie de sesión HttpOnly/SameSite/Max-Age",
+      "status": "PASS",
+      "expected": "HttpOnly; SameSite=Strict; Max-Age=3600",
+      "observed": [
+        "og_session=<redacted>; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict"
+      ],
+      "evidence": {}
+    },
+    {
+      "id": "API-036",
+      "module": "Persistence",
+      "scenario": "Contraseña no persistida en claro",
+      "status": "PASS",
+      "expected": "scrypt con sal individual; no password original",
+      "observed": [
+        {
+          "username": "qa-alice",
+          "algorithm": "scrypt",
+          "keyLength": 64
+        }
+      ],
+      "evidence": {
+        "path": "<isolated DATA_DIR>/db.json"
+      }
+    },
+    {
+      "id": "API-037",
+      "module": "Auth",
+      "scenario": "Registro duplicado ignorando mayúsculas",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Ese nombre de usuario ya está registrado",
+            "requestId": "94f815a1-40ec-47f4-99ca-17f01c4b46f8"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 4.1
+      },
+      "evidence": {
+        "request": "Registro duplicado ignorando mayúsculas",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-038",
+      "module": "Auth",
+      "scenario": "Registrar otra cuenta con sesión activa",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Cierra la sesión actual antes de crear otra cuenta",
+            "requestId": "646e0e4a-cfeb-4b76-b283-9cbb1673deac"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.45
+      },
+      "evidence": {
+        "request": "Registrar otra cuenta con sesión activa",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-039",
+      "module": "Auth",
+      "scenario": "Login contraseña errónea",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Usuario o contraseña incorrectos",
+            "requestId": "14cec191-993d-4172-ba85-e5ee83d5a1ab"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 69.59
+      },
+      "evidence": {
+        "request": "Login contraseña errónea",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-040",
+      "module": "Auth",
+      "scenario": "Login usuario inexistente",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Usuario o contraseña incorrectos",
+            "requestId": "852e553a-50a8-4f72-93e8-3ccde1aafd42"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 69.6
+      },
+      "evidence": {
+        "request": "Login usuario inexistente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-041",
+      "module": "Auth",
+      "scenario": "Login normaliza mayúsculas y espacios de usuario",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "user": {
+            "id": "491d0d75-de3d-4c34-a7b7-de5ba071eea1",
+            "username": "qa-alice",
+            "displayName": "qa-alice",
+            "createdAt": "2026-09-15T13:45:50.571Z",
+            "passkeys": [],
+            "passwordEnabled": true
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_session=<redacted>; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 96.06
+      },
+      "evidence": {
+        "request": "Login normaliza mayúsculas y espacios de usuario",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-042",
+      "module": "Auth",
+      "scenario": "Sesión firmada alterada",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "d2a712b6-2d3a-4221-a0ca-da75c22c2df8"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.84
+      },
+      "evidence": {
+        "request": "Sesión firmada alterada",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-043",
+      "module": "Auth",
+      "scenario": "Sesión firmada expirada",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "ef050848-ce56-49b3-a5b4-ab11610fce05"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.36
+      },
+      "evidence": {
+        "request": "Sesión firmada expirada",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-044",
+      "module": "Auth",
+      "scenario": "Sesión firmada usuario inexistente",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "f10dd19d-97fd-4dad-9b8a-579a764ea82c"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 3.72
+      },
+      "evidence": {
+        "request": "Sesión firmada usuario inexistente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-045",
+      "module": "HTTP",
+      "scenario": "Cookie mal codificada %ZZ se ignora sin autenticar",
+      "status": "PASS",
+      "expected": "HTTP 200 y contrato esperado",
+      "observed": {
+        "status": 200,
+        "body": {
+          "authenticated": false,
+          "user": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 4.3
+      },
+      "evidence": {
+        "request": "Cookie mal codificada %ZZ se ignora sin autenticar",
+        "responseReference": "observed"
+      },
+      "defect": "API-D004"
+    },
+    {
+      "id": "API-046",
+      "module": "HTTP",
+      "scenario": "Parámetro URL mal codificado %ZZ",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "Invalid URL encoding",
+            "requestId": "903d97f5-9bbb-47e3-a9c3-16e88e684964"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 2.14
+      },
+      "evidence": {
+        "request": "Parámetro URL mal codificado %ZZ",
+        "responseReference": "observed"
+      },
+      "defect": "API-D004"
+    },
+    {
+      "id": "API-047",
+      "module": "Authorization",
+      "scenario": "Dos usuarios reciben estados independientes",
+      "status": "PASS",
+      "expected": "owner y stateFileKey diferentes; 195 ejercicios iniciales",
+      "observed": {
+        "a": {
+          "userId": "491d0d75-de3d-4c34-a7b7-de5ba071eea1",
+          "stateFileKey": "d31b4f98-8e4a-4dd1-87ca-5f1a75f588cd",
+          "createdAt": "2026-09-15T13:45:50.640Z",
+          "updatedAt": "2026-09-15T13:45:50.640Z"
+        },
+        "b": {
+          "userId": "126a55de-0e6c-4151-8a7c-f004afcc1863",
+          "stateFileKey": "d6649e04-7d89-4ec0-ba59-3df67d822dec",
+          "createdAt": "2026-09-15T13:45:51.052Z",
+          "updatedAt": "2026-09-15T13:45:51.052Z"
+        },
+        "catalog": 195
+      },
+      "evidence": {}
+    },
+    {
+      "id": "API-048",
+      "module": "Authorization",
+      "scenario": "Alice intenta PUT estado de Bob",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "State owner does not match the authenticated user",
+            "requestId": "7227bd20-751e-417f-aa81-e0484c936a71"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 19.87
+      },
+      "evidence": {
+        "request": "Alice intenta PUT estado de Bob",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-049",
+      "module": "Authorization",
+      "scenario": "Query userId de Bob no cambia el usuario autenticado",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "revision": 1,
+          "owner": {
+            "userId": "491d0d75-de3d-4c34-a7b7-de5ba071eea1",
+            "stateFileKey": "d31b4f98-8e4a-4dd1-87ca-5f1a75f588cd",
+            "createdAt": "2026-09-15T13:45:50.640Z",
+            "updatedAt": "2026-09-15T13:45:50.640Z"
+          },
+          "bodyWeight": {
+            "goal": null,
+            "entries": []
+          },
+          "workoutSessions": [],
+          "exerciseLibraryCount": 195
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"1\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 17.99
+      },
+      "evidence": {
+        "request": "Query userId de Bob no cambia el usuario autenticado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-050",
+      "module": "BodyWeight",
+      "scenario": "Crear peso decimal con Unicode",
+      "status": "PASS",
+      "expected": "HTTP 201 y contrato esperado",
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "036606a7-c99e-4a30-bf27-17b413b8ae1a",
+          "measuredAt": "2026-09-09T12:00:00.000Z",
+          "weightKg": 80.5,
+          "note": "ñ y tildes: sesión"
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"2\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 28.76
+      },
+      "evidence": {
+        "request": "Crear peso decimal con Unicode",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-051",
+      "module": "Authorization",
+      "scenario": "Bob no puede borrar peso de Alice",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Body-weight entry not found",
+            "requestId": "9c72da0d-17c8-49ce-b4ff-b738bf9eb91d"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 16.27
+      },
+      "evidence": {
+        "request": "Bob no puede borrar peso de Alice",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-052",
+      "module": "BodyWeight",
+      "scenario": "Eliminar peso propio",
+      "status": "PASS",
+      "expected": "HTTP 204",
+      "observed": {
+        "status": 204,
+        "body": "",
+        "headers": {
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 31.75
+      },
+      "evidence": {
+        "request": "Eliminar peso propio",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-053",
+      "module": "BodyWeight",
+      "scenario": "Eliminar peso otra vez",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Body-weight entry not found",
+            "requestId": "d84492ff-57e5-4e6c-bb2c-acdc64fcce3d"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 15.21
+      },
+      "evidence": {
+        "request": "Eliminar peso otra vez",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-054",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "weightKg must be a number",
+            "requestId": "f0d25b91-9632-4b89-9160-451d5c0fe02c"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.1
+      },
+      "evidence": {
+        "request": "Peso inválido {}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-055",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {\"weightKg\":null}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "weightKg must be a number",
+            "requestId": "a34d83cb-5dd7-444a-b688-336774812390"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 8.33
+      },
+      "evidence": {
+        "request": "Peso inválido {\"weightKg\":null}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-056",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {\"weightKg\":\"80\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "weightKg must be a number",
+            "requestId": "76fce082-6949-49d7-9bdf-2925f8bd9cf4"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.27
+      },
+      "evidence": {
+        "request": "Peso inválido {\"weightKg\":\"80\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-057",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {\"weightKg\":19.99}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "weightKg is below the minimum",
+            "requestId": "16571b31-34af-49a5-a556-40fa9f4f3740"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 10.11
+      },
+      "evidence": {
+        "request": "Peso inválido {\"weightKg\":19.99}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-058",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {\"weightKg\":500.01}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "weightKg exceeds the maximum",
+            "requestId": "bc3a2d1f-2f3f-419c-8f10-65a701714b63"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 10.86
+      },
+      "evidence": {
+        "request": "Peso inválido {\"weightKg\":500.01}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-059",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {\"weightKg\":80,\"measuredAt\":\"not-date\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "measuredAt must be an ISO date-time with a time zone",
+            "requestId": "2c8ce54c-bb01-4793-8c53-4e337b49fc3d"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.4
+      },
+      "evidence": {
+        "request": "Peso inválido {\"weightKg\":80,\"measuredAt\":\"not-date\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-060",
+      "module": "BodyWeight",
+      "scenario": "Peso inválido {\"weightKg\":80,\"note\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "note is too long",
+            "requestId": "ea03fabe-756d-46cf-be8f-539d3192877e"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 10.92
+      },
+      "evidence": {
+        "request": "Peso inválido {\"weightKg\":80,\"note\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-061",
+      "module": "BodyWeight",
+      "scenario": "Peso límite 20",
+      "status": "PASS",
+      "expected": "HTTP 201",
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "93cf12df-17b1-4ac0-aa74-29a8cdd2ec7e",
+          "measuredAt": "2026-09-15T13:45:51.325Z",
+          "weightKg": 20,
+          "note": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"4\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 30.49
+      },
+      "evidence": {
+        "request": "Peso límite 20",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-062",
+      "module": "BodyWeight",
+      "scenario": "Peso límite 500",
+      "status": "PASS",
+      "expected": "HTTP 201",
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "0a8360a8-1e66-4559-bc22-239dc52f7606",
+          "measuredAt": "2026-09-15T13:45:51.358Z",
+          "weightKg": 500,
+          "note": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"5\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 30.95
+      },
+      "evidence": {
+        "request": "Peso límite 500",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-063",
+      "module": "Validation",
+      "scenario": "Fecha imposible 2026-02-30T00:00:00Z",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "measuredAt must use YYYY-MM-DD",
+            "requestId": "e79dc621-0a99-464e-a4f6-45dfa9e20f37"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.5
+      },
+      "evidence": {
+        "request": "Fecha imposible 2026-02-30T00:00:00Z",
+        "responseReference": "observed"
+      },
+      "defect": "API-D005"
+    },
+    {
+      "id": "API-064",
+      "module": "State",
+      "scenario": "PUT estado válido If-Match",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "revision": 6,
+          "owner": {
+            "userId": "491d0d75-de3d-4c34-a7b7-de5ba071eea1",
+            "stateFileKey": "d31b4f98-8e4a-4dd1-87ca-5f1a75f588cd",
+            "createdAt": "2026-09-15T13:45:50.640Z",
+            "updatedAt": "2026-09-15T13:45:51.425Z"
+          },
+          "bodyWeight": {
+            "goal": null,
+            "entries": [
+              {
+                "id": "93cf12df-17b1-4ac0-aa74-29a8cdd2ec7e",
+                "measuredAt": "2026-09-15T13:45:51.325Z",
+                "weightKg": 20,
+                "note": null
+              },
+              {
+                "id": "0a8360a8-1e66-4559-bc22-239dc52f7606",
+                "measuredAt": "2026-09-15T13:45:51.358Z",
+                "weightKg": 500,
+                "note": null
+              }
+            ]
+          },
+          "workoutSessions": [],
+          "exerciseLibraryCount": 195
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"6\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 36.72
+      },
+      "evidence": {
+        "request": "PUT estado válido If-Match",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-065",
+      "module": "State",
+      "scenario": "PUT revisión obsoleta",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "State revision mismatch; current revision is 6",
+            "requestId": "a945f3e4-623d-41f4-9fd2-d2b884bcdf73"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 22.71
+      },
+      "evidence": {
+        "request": "PUT revisión obsoleta",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-066",
+      "module": "State",
+      "scenario": "PUT If-Match inválido",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "If-Match must contain a numeric state revision",
+            "requestId": "2409cf07-d729-4b02-acbe-ad05d973b408"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 12.21
+      },
+      "evidence": {
+        "request": "PUT If-Match inválido",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-067",
+      "module": "State",
+      "scenario": "PUT documento vacío",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "State must use schemaVersion 1",
+            "requestId": "4f43f36a-550d-4dab-964d-92ed868bf8ad"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 17.1
+      },
+      "evidence": {
+        "request": "PUT documento vacío",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-068",
+      "module": "Concurrency",
+      "scenario": "10 reemplazos con misma revisión",
+      "status": "PASS",
+      "expected": "1 éxito y 9 conflictos",
+      "observed": [
+        200,
+        409,
+        409,
+        409,
+        409,
+        409,
+        409,
+        409,
+        409,
+        409
+      ],
+      "evidence": {}
+    },
+    {
+      "id": "API-069",
+      "module": "Concurrency",
+      "scenario": "20 altas de peso concurrentes",
+      "status": "PASS",
+      "expected": "20 HTTP201, 20 registros adicionales, IDs únicos",
+      "observed": {
+        "statuses": [
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201,
+          201
+        ],
+        "before": 2,
+        "after": 22
+      },
+      "evidence": {}
+    },
+    {
+      "id": "API-070",
+      "module": "Concurrency",
+      "scenario": "8 registros del mismo usuario concurrentes",
+      "status": "PASS",
+      "expected": "1 creado y 7 HTTP409",
+      "observed": [
+        201,
+        409,
+        409,
+        409,
+        409,
+        409,
+        409,
+        409
+      ],
+      "evidence": {}
+    },
+    {
+      "id": "API-071",
+      "module": "Security",
+      "scenario": "12 contraseñas erróneas simultáneas con límite de 5",
+      "status": "PASS",
+      "expected": "Máximo 5 verificaciones; resto HTTP429",
+      "observed": [
+        401,
+        401,
+        401,
+        401,
+        401,
+        429,
+        429,
+        429,
+        429,
+        429,
+        429,
+        429
+      ],
+      "evidence": {
+        "subsequent": {
+          "status": 429,
+          "body": {
+            "error": {
+              "code": "TOO_MANY_REQUESTS",
+              "message": "Demasiados intentos. Espera 15 minutos antes de volver a probar",
+              "requestId": "669e29d0-990c-4d85-b32f-a9bc42f0f6df"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 1.39
+        }
+      },
+      "defect": "API-D006"
+    },
+    {
+      "id": "API-072",
+      "module": "Security",
+      "scenario": "Bloqueo tras 5 fallos secuenciales",
+      "status": "PASS",
+      "expected": "HTTP 429",
+      "observed": {
+        "status": 429,
+        "body": {
+          "error": {
+            "code": "TOO_MANY_REQUESTS",
+            "message": "Demasiados intentos. Espera 15 minutos antes de volver a probar",
+            "requestId": "1886b324-22fa-4389-adc8-de1bc4f19361"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 1.09
+      },
+      "evidence": {
+        "request": "Bloqueo tras 5 fallos secuenciales",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-073",
+      "module": "StateValidation",
+      "scenario": "weightKg negativo vía estado",
+      "status": "PASS",
+      "expected": "HTTP400, estado previo conservado",
+      "observed": {
+        "put": {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "BAD_REQUEST",
+              "message": "bodyWeight.entries[0].measuredAt must be an ISO date-time with a time zone",
+              "requestId": "6a272064-fdc0-47e8-b6a5-ef6eabd88693"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 10.15
+        }
+      },
+      "evidence": {
+        "mutation": "weightKg negativo vía estado"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-074",
+      "module": "StateValidation",
+      "scenario": "perfil con edad negativa y sexo arbitrario",
+      "status": "PASS",
+      "expected": "HTTP400, estado previo conservado",
+      "observed": {
+        "put": {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "BAD_REQUEST",
+              "message": "bodyMetrics.profile.sex: unsupported value",
+              "requestId": "ca35a0dd-0b54-400c-85d7-a5edbbe9a788"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 17.37
+        }
+      },
+      "evidence": {
+        "mutation": "perfil con edad negativa y sexo arbitrario"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-075",
+      "module": "StateValidation",
+      "scenario": "plan, preferencias y recordatorio nulos",
+      "status": "PASS",
+      "expected": "HTTP400, estado previo conservado",
+      "observed": {
+        "put": {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "BAD_REQUEST",
+              "message": "preferences: must be an object",
+              "requestId": "7efd3112-ab9b-4549-bf13-c7ac894f548c"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 15.08
+        }
+      },
+      "evidence": {
+        "mutation": "plan, preferencias y recordatorio nulos"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-076",
+      "module": "StateValidation",
+      "scenario": "sesión nula en colección",
+      "status": "PASS",
+      "expected": "HTTP400, estado previo conservado",
+      "observed": {
+        "put": {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "BAD_REQUEST",
+              "message": "workoutSessions[0]: must be an object",
+              "requestId": "c4b89332-62f6-49f9-85fa-943aa53c15e9"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 17.07
+        },
+        "followup": {
+          "status": 200,
+          "body": {
+            "exercise": null
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 16.01
+        }
+      },
+      "evidence": {
+        "mutation": "sesión nula en colección"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-077",
+      "module": "StateValidation",
+      "scenario": "IDs duplicados de ejercicios",
+      "status": "PASS",
+      "expected": "HTTP400, estado previo conservado",
+      "observed": {
+        "put": {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "BAD_REQUEST",
+              "message": "exerciseLibrary: duplicate identifiers",
+              "requestId": "3c61674a-ada4-4ee9-9fd0-de57d5ab5204"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 17.04
+        }
+      },
+      "evidence": {
+        "mutation": "IDs duplicados de ejercicios"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-078",
+      "module": "StateValidation",
+      "scenario": "progresión con configuración nula",
+      "status": "PASS",
+      "expected": "HTTP400, estado previo conservado",
+      "observed": {
+        "put": {
+          "status": 400,
+          "body": {
+            "error": {
+              "code": "BAD_REQUEST",
+              "message": "progression.exerciseRules[0].config: must be an object",
+              "requestId": "9e948d7e-a248-4ca9-8758-5ab1c1f6182b"
+            }
+          },
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "referrer-policy": "strict-origin-when-cross-origin",
+            "x-content-type-options": "nosniff",
+            "x-frame-options": "DENY"
+          },
+          "cookieAttributes": [],
+          "elapsedMs": 17.61
+        }
+      },
+      "evidence": {
+        "mutation": "progresión con configuración nula"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-079",
+      "module": "StateValidation",
+      "scenario": "exerciseLibrary contiene null",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "exerciseLibrary[0]: must be an object",
+            "requestId": "455f1b3f-aea4-46ec-aea7-686605dd5dc3"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 16.46
+      },
+      "evidence": {
+        "request": "exerciseLibrary contiene null",
+        "responseReference": "observed"
+      },
+      "defect": "API-D003"
+    },
+    {
+      "id": "API-080",
+      "module": "Workout",
+      "scenario": "Crear sesión con serie válida",
+      "status": "PASS",
+      "expected": "HTTP 201",
+      "observed": {
+        "status": 201,
+        "body": {
+          "id": "ebb55aed-e2f4-4c6b-8f87-dec9fb195d42",
+          "planDayId": null,
+          "scheduledDate": "2026-09-15",
+          "startedAt": "2026-09-15T13:45:52.841Z",
+          "completedAt": null,
+          "status": "active",
+          "exercises": [
+            {
+              "exerciseId": "back-squat",
+              "sets": [
+                {
+                  "setNumber": 1,
+                  "loadKg": 60,
+                  "repetitions": 8,
+                  "durationSeconds": null,
+                  "side": null,
+                  "rpe": 8,
+                  "rir": 2,
+                  "completedAt": "2026-09-15T13:45:50.373Z"
+                }
+              ],
+              "estimatedOneRepMaxKg": null,
+              "notes": null
+            }
+          ],
+          "notes": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"28\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 25.04
+      },
+      "evidence": {
+        "request": "Crear sesión con serie válida",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-081",
+      "module": "Workout",
+      "scenario": "Segundo entrenamiento activo bloqueado",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Complete or cancel the active workout before starting another",
+            "requestId": "927c4c13-fc98-495d-92f6-15f26c4e331f"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 14.92
+      },
+      "evidence": {
+        "request": "Segundo entrenamiento activo bloqueado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-082",
+      "module": "Authorization",
+      "scenario": "Bob no puede editar sesión de Alice",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Workout session not found",
+            "requestId": "5a71a4fc-c59f-4b55-878c-2d792391816c"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 14.39
+      },
+      "evidence": {
+        "request": "Bob no puede editar sesión de Alice",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-083",
+      "module": "Workout",
+      "scenario": "Editar notas de sesión activa",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "id": "ebb55aed-e2f4-4c6b-8f87-dec9fb195d42",
+          "planDayId": null,
+          "scheduledDate": "2026-09-15",
+          "startedAt": "2026-09-15T13:45:52.841Z",
+          "completedAt": null,
+          "status": "active",
+          "exercises": [
+            {
+              "exerciseId": "back-squat",
+              "sets": [
+                {
+                  "setNumber": 1,
+                  "loadKg": 60,
+                  "repetitions": 8,
+                  "durationSeconds": null,
+                  "side": null,
+                  "rpe": 8,
+                  "rir": 2,
+                  "completedAt": "2026-09-15T13:45:50.373Z"
+                }
+              ],
+              "estimatedOneRepMaxKg": null,
+              "notes": null
+            }
+          ],
+          "notes": "Ejecución QA ñ"
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"29\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 26.51
+      },
+      "evidence": {
+        "request": "Editar notas de sesión activa",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-084",
+      "module": "Workout",
+      "scenario": "RPE fuera de límites",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "rpe exceeds the maximum",
+            "requestId": "7d4e4230-8ac1-4b9f-bb06-4678045cda6e"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 13.83
+      },
+      "evidence": {
+        "request": "RPE fuera de límites",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-085",
+      "module": "Workout",
+      "scenario": "Completar sesión",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "session": {
+            "id": "ebb55aed-e2f4-4c6b-8f87-dec9fb195d42",
+            "planDayId": null,
+            "scheduledDate": "2026-09-15",
+            "startedAt": "2026-09-15T13:45:52.841Z",
+            "completedAt": "2026-09-15T13:45:52.943Z",
+            "status": "completed",
+            "exercises": [
+              {
+                "exerciseId": "back-squat",
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "loadKg": 60,
+                    "repetitions": 8,
+                    "durationSeconds": null,
+                    "side": null,
+                    "rpe": 8,
+                    "rir": 2,
+                    "completedAt": "2026-09-15T13:45:50.373Z"
+                  }
+                ],
+                "estimatedOneRepMaxKg": 76,
+                "notes": null
+              }
+            ],
+            "notes": "Ejecución QA ñ"
+          },
+          "progression": {
+            "exerciseRules": []
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"30\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 28.65
+      },
+      "evidence": {
+        "request": "Completar sesión",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-086",
+      "module": "Workout",
+      "scenario": "Recuperar serie previa y 1RM 76kg",
+      "status": "PASS",
+      "expected": "HTTP 200 y contrato esperado",
+      "observed": {
+        "status": 200,
+        "body": {
+          "exercise": {
+            "exerciseId": "back-squat",
+            "sets": [
+              {
+                "setNumber": 1,
+                "loadKg": 60,
+                "repetitions": 8,
+                "durationSeconds": null,
+                "side": null,
+                "rpe": 8,
+                "rir": 2,
+                "completedAt": "2026-09-15T13:45:50.373Z"
+              }
+            ],
+            "estimatedOneRepMaxKg": 76,
+            "notes": null
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 16.21
+      },
+      "evidence": {
+        "request": "Recuperar serie previa y 1RM 76kg",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-087",
+      "module": "Workout",
+      "scenario": "Completar dos veces es idempotente",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "session": {
+            "id": "ebb55aed-e2f4-4c6b-8f87-dec9fb195d42",
+            "planDayId": null,
+            "scheduledDate": "2026-09-15",
+            "startedAt": "2026-09-15T13:45:52.841Z",
+            "completedAt": "2026-09-15T13:45:52.943Z",
+            "status": "completed",
+            "exercises": [
+              {
+                "exerciseId": "back-squat",
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "loadKg": 60,
+                    "repetitions": 8,
+                    "durationSeconds": null,
+                    "side": null,
+                    "rpe": 8,
+                    "rir": 2,
+                    "completedAt": "2026-09-15T13:45:50.373Z"
+                  }
+                ],
+                "estimatedOneRepMaxKg": 76,
+                "notes": null
+              }
+            ],
+            "notes": "Ejecución QA ñ"
+          },
+          "progression": {
+            "exerciseRules": []
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"31\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 28.52
+      },
+      "evidence": {
+        "request": "Completar dos veces es idempotente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-088",
+      "module": "Workout",
+      "scenario": "Editar completado rechazado",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Only active workouts can be edited",
+            "requestId": "22d27712-45b6-48c7-8819-89cd69bead9a"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.96
+      },
+      "evidence": {
+        "request": "Editar completado rechazado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-089",
+      "module": "Workout",
+      "scenario": "Cancelar completado rechazado",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Completed workout cannot be cancelled",
+            "requestId": "65732158-115d-42d8-ad28-0e1ef8d4f7de"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 15.27
+      },
+      "evidence": {
+        "request": "Cancelar completado rechazado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-090",
+      "module": "Workout",
+      "scenario": "Completar inexistente",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Workout session not found",
+            "requestId": "e0eec590-8465-43c1-a2ea-77c5f839ebcd"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 12.3
+      },
+      "evidence": {
+        "request": "Completar inexistente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-091",
+      "module": "Workout",
+      "scenario": "Completar sin ejercicios rechazado",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Complete every workout set before finishing the session",
+            "requestId": "f3baed67-ac4e-4e6b-af77-a816e38ec54a"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 15.3
+      },
+      "evidence": {
+        "request": "Completar sin ejercicios rechazado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-092",
+      "module": "Workout",
+      "scenario": "Cancelar activo",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "id": "95ba2cb9-8dff-4deb-8da9-5789004c0619",
+          "planDayId": null,
+          "scheduledDate": "2026-09-15",
+          "startedAt": "2026-09-15T13:45:53.053Z",
+          "completedAt": "2026-09-15T13:45:53.098Z",
+          "status": "cancelled",
+          "exercises": [],
+          "notes": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "etag": "\"33\"",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 29.07
+      },
+      "evidence": {
+        "request": "Cancelar activo",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-093",
+      "module": "Workout",
+      "scenario": "Completar cancelado rechazado",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Cancelled workout cannot be completed",
+            "requestId": "427cb632-c7f6-4b8b-985d-7ea48b5e79dd"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 15.58
+      },
+      "evidence": {
+        "request": "Completar cancelado rechazado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-094",
+      "module": "Workout",
+      "scenario": "Ejercicio inexistente, setNumber repetido y fecha imposible",
+      "status": "PASS",
+      "expected": "HTTP400; referencias y fecha válidas",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "scheduledDate must use YYYY-MM-DD",
+            "requestId": "3274b204-235c-4fbc-a50d-5d3ced6b9416"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 9.04
+      },
+      "evidence": {
+        "payload": {
+          "scheduledDate": "2026-02-30",
+          "exerciseId": "does-not-exist",
+          "setNumbers": [
+            1,
+            1
+          ]
+        }
+      },
+      "defect": "API-D007"
+    },
+    {
+      "id": "API-095",
+      "module": "Push",
+      "scenario": "VAPID sin configurar informa 503",
+      "status": "PASS",
+      "expected": "HTTP 503",
+      "observed": {
+        "status": 503,
+        "body": {
+          "error": {
+            "code": "SERVICE_UNAVAILABLE",
+            "message": "Web Push is not configured",
+            "requestId": "031ae639-7d91-45a6-b99b-cadd19ef13e9"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 7.91
+      },
+      "evidence": {
+        "request": "VAPID sin configurar informa 503",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-096",
+      "module": "Push",
+      "scenario": "Suscripción sin VAPID informa 503",
+      "status": "PASS",
+      "expected": "HTTP 503",
+      "observed": {
+        "status": 503,
+        "body": {
+          "error": {
+            "code": "SERVICE_UNAVAILABLE",
+            "message": "Web Push is not configured",
+            "requestId": "f8151e8b-b99a-4555-a06b-e5e88d1fbde6"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 9.75
+      },
+      "evidence": {
+        "request": "Suscripción sin VAPID informa 503",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-097",
+      "module": "Push",
+      "scenario": "Temporizador sin VAPID informa 503",
+      "status": "PASS",
+      "expected": "HTTP 503",
+      "observed": {
+        "status": 503,
+        "body": {
+          "error": {
+            "code": "SERVICE_UNAVAILABLE",
+            "message": "Web Push is not configured",
+            "requestId": "4241ca1f-bcc1-4ff0-bddc-01b046ffe7cb"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 10.69
+      },
+      "evidence": {
+        "request": "Temporizador sin VAPID informa 503",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-098",
+      "module": "Push",
+      "scenario": "Temporizador inválido informa 400",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "durationSeconds is below the minimum",
+            "requestId": "215be73c-c237-4c55-b30c-c68cc26a451e"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 8.6
+      },
+      "evidence": {
+        "request": "Temporizador inválido informa 400",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-099",
+      "module": "Push",
+      "scenario": "Eliminar suscripción inexistente",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Push subscription not found",
+            "requestId": "455d2ed9-8174-44ac-b938-197a7adccd1d"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 15.64
+      },
+      "evidence": {
+        "request": "Eliminar suscripción inexistente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-100",
+      "module": "Push",
+      "scenario": "Eliminar temporizador inexistente",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Rest timer not found",
+            "requestId": "79278c0c-5140-4dbd-b002-eaf639bd9e59"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 16.26
+      },
+      "evidence": {
+        "request": "Eliminar temporizador inexistente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-101",
+      "module": "Push",
+      "scenario": "Sincronizar recordatorio mensual",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "enabled": true,
+          "intervalMonths": 1,
+          "nextDueAt": "2026-10-15T13:45:50.640Z",
+          "lastNotifiedAt": null
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 18.4
+      },
+      "evidence": {
+        "request": "Sincronizar recordatorio mensual",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-102",
+      "module": "WebAuthn",
+      "scenario": "Opciones RP localhost y UV/residentKey requeridos",
+      "status": "PASS",
+      "expected": "HTTP 200 y contrato esperado",
+      "observed": {
+        "status": 200,
+        "body": {
+          "challenge": "<redacted>",
+          "rp": {
+            "name": "FORJA QA",
+            "id": "localhost"
+          },
+          "user": {
+            "id": "GvMPRpoOItYctEw0CKd0ATVlqlQL0zPDJhpIFGVBa3c",
+            "name": "qa-passkey",
+            "displayName": "QA Passkey"
+          },
+          "pubKeyCredParams": [
+            {
+              "alg": -7,
+              "type": "public-key"
+            },
+            {
+              "alg": -257,
+              "type": "public-key"
+            }
+          ],
+          "timeout": 300000,
+          "attestation": "none",
+          "excludeCredentials": [],
+          "authenticatorSelection": {
+            "residentKey": "required",
+            "userVerification": "required",
+            "requireResidentKey": true
+          },
+          "extensions": {
+            "credProps": true
+          },
+          "hints": []
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=300; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 29.55
+      },
+      "evidence": {
+        "request": "Opciones RP localhost y UV/residentKey requeridos",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-103",
+      "module": "WebAuthn",
+      "scenario": "Registro real con clave ECDSA y attestation none local",
+      "status": "PASS",
+      "expected": "HTTP 201",
+      "observed": {
+        "status": 201,
+        "body": {
+          "verified": true,
+          "user": {
+            "id": "a258e494-b360-4766-8400-a343ec681c1c",
+            "username": "qa-passkey",
+            "displayName": "QA Passkey",
+            "createdAt": "2026-09-15T13:45:53.286Z",
+            "passkeys": [
+              {
+                "id": "axO3l5uM13gynOnS2NfQTi8-brceWRA9",
+                "transports": [
+                  "internal"
+                ],
+                "deviceType": "singleDevice",
+                "backedUp": false,
+                "createdAt": "2026-09-15T13:45:53.286Z",
+                "lastUsedAt": null
+              }
+            ],
+            "passwordEnabled": false
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict",
+          "og_session=<redacted>; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 61.87
+      },
+      "evidence": {
+        "request": "Registro real con clave ECDSA y attestation none local",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-104",
+      "module": "WebAuthn",
+      "scenario": "Listar passkey sin exponer clave privada ni pública",
+      "status": "PASS",
+      "expected": "HTTP 200 y contrato esperado",
+      "observed": {
+        "status": 200,
+        "body": {
+          "passkeys": [
+            {
+              "id": "axO3l5uM13gynOnS2NfQTi8-brceWRA9",
+              "transports": [
+                "internal"
+              ],
+              "deviceType": "singleDevice",
+              "backedUp": false,
+              "createdAt": "2026-09-15T13:45:53.286Z",
+              "lastUsedAt": null
+            }
+          ]
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 10.13
+      },
+      "evidence": {
+        "request": "Listar passkey sin exponer clave privada ni pública",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-105",
+      "module": "Authorization",
+      "scenario": "Alice no elimina passkey de otro usuario",
+      "status": "PASS",
+      "expected": "HTTP 404",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Passkey not found",
+            "requestId": "fd2d47be-bd49-4337-ab2a-cb83af36b938"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.35
+      },
+      "evidence": {
+        "request": "Alice no elimina passkey de otro usuario",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-106",
+      "module": "WebAuthn",
+      "scenario": "No eliminar único método de acceso",
+      "status": "PASS",
+      "expected": "HTTP 409",
+      "observed": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "La cuenta debe conservar al menos un método de acceso",
+            "requestId": "bd753614-5a00-4328-856e-dd48505f4e0e"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 11.22
+      },
+      "evidence": {
+        "request": "No eliminar único método de acceso",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-107",
+      "module": "WebAuthn",
+      "scenario": "Opciones de login restringidas a usuario",
+      "status": "PASS",
+      "expected": "HTTP 200 y contrato esperado",
+      "observed": {
+        "status": 200,
+        "body": {
+          "rpId": "localhost",
+          "challenge": "<redacted>",
+          "allowCredentials": [
+            {
+              "id": "axO3l5uM13gynOnS2NfQTi8-brceWRA9",
+              "transports": [
+                "internal"
+              ],
+              "type": "public-key"
+            }
+          ],
+          "timeout": 300000,
+          "userVerification": "required"
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=300; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 19.87
+      },
+      "evidence": {
+        "request": "Opciones de login restringidas a usuario",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-108",
+      "module": "WebAuthn",
+      "scenario": "Verificación ECDSA válida contador cero",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "verified": true,
+          "user": {
+            "id": "a258e494-b360-4766-8400-a343ec681c1c",
+            "username": "qa-passkey",
+            "displayName": "QA Passkey",
+            "createdAt": "2026-09-15T13:45:53.286Z",
+            "passkeys": [
+              {
+                "id": "axO3l5uM13gynOnS2NfQTi8-brceWRA9",
+                "transports": [
+                  "internal"
+                ],
+                "deviceType": "singleDevice",
+                "backedUp": false,
+                "createdAt": "2026-09-15T13:45:53.286Z",
+                "lastUsedAt": "2026-09-15T13:45:53.412Z"
+              }
+            ],
+            "passwordEnabled": false
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict",
+          "og_session=<redacted>; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 52.13
+      },
+      "evidence": {
+        "request": "Verificación ECDSA válida contador cero",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-109",
+      "module": "WebAuthn",
+      "scenario": "Replay idéntico de assertion y cookie de ceremonia",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication ceremony expired or missing",
+            "requestId": "bff7302b-f265-4d91-817c-99dfbb0d243e"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 13.92
+      },
+      "evidence": {
+        "request": "Replay idéntico de assertion y cookie de ceremonia",
+        "responseReference": "observed"
+      },
+      "defect": "API-D002"
+    },
+    {
+      "id": "API-110",
+      "module": "WebAuthn",
+      "scenario": "Challenge incorrecto rechazado",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Passkey authentication response is invalid",
+            "requestId": "43c7d053-cf7a-4b86-91af-8cc588627ccb"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 18.41
+      },
+      "evidence": {
+        "request": "Challenge incorrecto rechazado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-111",
+      "module": "WebAuthn",
+      "scenario": "Origen incorrecto criptográficamente firmado rechazado",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Passkey authentication response is invalid",
+            "requestId": "b3b120ef-ecc2-4331-8e09-866eb7f5b7de"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 29.23
+      },
+      "evidence": {
+        "request": "Origen incorrecto criptográficamente firmado rechazado",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-112",
+      "module": "WebAuthn",
+      "scenario": "Assertion válida de otra cuenta rechazada",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Passkey is not registered for this account",
+            "requestId": "0211fbbe-7c68-424f-b5b9-209f19b04102"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 24.63
+      },
+      "evidence": {
+        "request": "Assertion válida de otra cuenta rechazada",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-113",
+      "module": "WebAuthn",
+      "scenario": "Añadir passkey a cuenta con contraseña",
+      "status": "PASS",
+      "expected": "HTTP 201",
+      "observed": {
+        "status": 201,
+        "body": {
+          "verified": true,
+          "user": {
+            "id": "491d0d75-de3d-4c34-a7b7-de5ba071eea1",
+            "username": "qa-alice",
+            "displayName": "qa-alice",
+            "createdAt": "2026-09-15T13:45:50.571Z",
+            "passkeys": [
+              {
+                "id": "Li6D9ZhDJCAxFUp5ODeVX8L3R4amIlAj",
+                "transports": [
+                  "internal"
+                ],
+                "deviceType": "singleDevice",
+                "backedUp": false,
+                "createdAt": "2026-09-15T13:45:53.635Z",
+                "lastUsedAt": null
+              }
+            ],
+            "passwordEnabled": true
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict",
+          "og_session=<redacted>; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 52.21
+      },
+      "evidence": {
+        "request": "Añadir passkey a cuenta con contraseña",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-114",
+      "module": "WebAuthn",
+      "scenario": "Eliminar passkey conservando contraseña",
+      "status": "PASS",
+      "expected": "HTTP 204",
+      "observed": {
+        "status": 204,
+        "body": "",
+        "headers": {
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 16.47
+      },
+      "evidence": {
+        "request": "Eliminar passkey conservando contraseña",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-115",
+      "module": "WebAuthn",
+      "scenario": "Verificación sin ceremonia",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication ceremony expired or missing",
+            "requestId": "dc3aad75-d28e-4331-a682-8d819e86096a"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=0; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 4.24
+      },
+      "evidence": {
+        "request": "Verificación sin ceremonia",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-116",
+      "module": "WebAuthn",
+      "scenario": "Opciones cuenta inexistente",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "No account is registered for that username",
+            "requestId": "3f60f685-7aa5-4b55-ae31-81cd4dbb8fdd"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 5.06
+      },
+      "evidence": {
+        "request": "Opciones cuenta inexistente",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-117",
+      "module": "WebAuthn",
+      "scenario": "Opciones login descubrible sin usuario",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "status": 200,
+        "body": {
+          "rpId": "localhost",
+          "challenge": "<redacted>",
+          "timeout": 300000,
+          "userVerification": "required"
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_auth_flow=<redacted>; Max-Age=300; Path=/api/auth; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 13.36
+      },
+      "evidence": {
+        "request": "Opciones login descubrible sin usuario",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-118",
+      "module": "Persistence",
+      "scenario": "Datos sobreviven reinicio del servidor",
+      "status": "PASS",
+      "expected": "Estado idéntico después del reinicio",
+      "observed": {
+        "revisionBefore": 33,
+        "revisionAfter": 33,
+        "weightCount": 22
+      },
+      "evidence": {
+        "path": "<isolated DATA_DIR>/state-<id>.json"
+      }
+    },
+    {
+      "id": "API-119",
+      "module": "PushSecurity",
+      "scenario": "Destinos Push loopback, link-local y privado llegan a transporte",
+      "status": "PASS",
+      "expected": "Rechazo antes de persistir/enviar destinos internos",
+      "observed": {
+        "subscriptions": [
+          {
+            "status": 400
+          },
+          {
+            "status": 400
+          },
+          {
+            "status": 400
+          }
+        ],
+        "timerStatus": 400,
+        "stubCalls": []
+      },
+      "evidence": {
+        "transport": "web-push.sendNotification sustituido temporalmente por stub en memoria; cero conexiones de red",
+        "endpoints": [
+          "https://127.0.0.1:9443/internal",
+          "https://169.254.169.254/metadata",
+          "https://10.0.0.1/admin"
+        ]
+      },
+      "defect": "API-D008"
+    },
+    {
+      "id": "API-120",
+      "module": "Push",
+      "scenario": "Suscripción sin HTTPS rechazada con VAPID activo",
+      "status": "PASS",
+      "expected": "HTTP 400",
+      "observed": {
+        "status": 400,
+        "body": {
+          "error": {
+            "code": "BAD_REQUEST",
+            "message": "Push endpoint must use a public HTTPS destination",
+            "requestId": "bbba6280-11ea-4dfe-a1bb-f0f6602105cf"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 19.09
+      },
+      "evidence": {
+        "request": "Suscripción sin HTTPS rechazada con VAPID activo",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-121",
+      "module": "Auth",
+      "scenario": "Logout borra cookie del navegador",
+      "status": "PASS",
+      "expected": "HTTP 204",
+      "observed": {
+        "status": 204,
+        "body": "",
+        "headers": {
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [
+          "og_session=<redacted>; Max-Age=0; Path=/; HttpOnly; SameSite=Strict"
+        ],
+        "elapsedMs": 25.21
+      },
+      "evidence": {
+        "request": "Logout borra cookie del navegador",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-122",
+      "module": "Auth",
+      "scenario": "Acceso sin cookie después de logout",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "a8efc72a-6add-443f-9fa3-e4b8bb4f991d"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 3.69
+      },
+      "evidence": {
+        "request": "Acceso sin cookie después de logout",
+        "responseReference": "observed"
+      }
+    },
+    {
+      "id": "API-123",
+      "module": "Auth",
+      "scenario": "Reutilizar cookie capturada antes de logout",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "status": 401,
+        "body": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "Authentication required",
+            "requestId": "932c8183-3f34-4016-b28f-485c33f117c2"
+          }
+        },
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY"
+        },
+        "cookieAttributes": [],
+        "elapsedMs": 6.25
+      },
+      "evidence": {
+        "request": "Reutilizar cookie capturada antes de logout",
+        "responseReference": "observed"
+      },
+      "defect": "API-D001"
+    },
+    {
+      "id": "API-124",
+      "module": "Performance",
+      "scenario": "25 lecturas concurrentes de estado pequeño",
+      "status": "PASS",
+      "expected": "Todos HTTP200, p95 < 500ms",
+      "observed": {
+        "p50": 212.23,
+        "p95": 307.47,
+        "max": 317.86,
+        "statuses": [
+          200
+        ]
+      },
+      "evidence": {
+        "environment": "Loopback Windows, dataset QA; no extrapolar a carga producción"
+      }
+    },
+    {
+      "id": "API-125",
+      "module": "Persistence",
+      "scenario": "Escrituras atómicas no dejan temporales",
+      "status": "PASS",
+      "expected": "db.json y state-*.json; ningún .tmp",
+      "observed": [
+        "db.json",
+        "state-a258e494-b360-4766-8400-a343ec681c1c.json",
+        "state-d31b4f98-8e4a-4dd1-87ca-5f1a75f588cd.json",
+        "state-d6649e04-7d89-4ec0-ba59-3df67d822dec.json",
+        "state-e6b22327-3ef7-4d85-afac-3772b744071f.json"
+      ],
+      "evidence": {
+        "path": "<isolated DATA_DIR>"
+      }
+    },
+    {
+      "id": "API-126",
+      "module": "Limits",
+      "scenario": "Passkey hardware/biometría/navegadores reales",
+      "status": "BLOCKED",
+      "expected": "Verificación específica",
+      "observed": "Esta prueba usa autenticador criptográfico local; no demuestra interacción biométrica real.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    },
+    {
+      "id": "API-127",
+      "module": "Limits",
+      "scenario": "Entrega Web Push a proveedor externo",
+      "status": "BLOCKED",
+      "expected": "Verificación específica",
+      "observed": "VAPID desactivado deliberadamente; no enviar notificaciones a terceros durante auditoría.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    },
+    {
+      "id": "API-128",
+      "module": "Limits",
+      "scenario": "HTTPS y cookie Secure extremo a extremo",
+      "status": "BLOCKED",
+      "expected": "Verificación específica",
+      "observed": "Servidor loopback HTTP; requiere despliegue TLS.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    },
+    {
+      "id": "API-129",
+      "module": "Limits",
+      "scenario": "Recuperar/cambiar contraseña o deshabilitar usuario",
+      "status": "NOT APPLICABLE",
+      "expected": "Verificación específica",
+      "observed": "No hay estos endpoints ni requisito confirmado de recuperación.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    },
+    {
+      "id": "API-130",
+      "module": "Limits",
+      "scenario": "Múltiples procesos compartiendo DATA_DIR",
+      "status": "NOT TESTED",
+      "expected": "Verificación específica",
+      "observed": "Docker ejecuta una réplica; mutex es por proceso. Riesgo si se escala sin almacenamiento transaccional.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    },
+    {
+      "id": "API-131",
+      "module": "Limits",
+      "scenario": "Corte de energía/durabilidad completa ante fallo de disco",
+      "status": "NOT TESTED",
+      "expected": "Verificación específica",
+      "observed": "Se añade flush de contenido antes de rename; no se simula corte de energía ni se certifica la durabilidad del directorio o del almacenamiento físico.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    },
+    {
+      "id": "API-132",
+      "module": "Limits",
+      "scenario": "Conectividad/explotación SSRF vía Push",
+      "status": "NOT TESTED",
+      "expected": "Verificación específica",
+      "observed": "Restricción de destinos validada con transporte stub y pruebas DNS; no se emiten solicitudes reales a destinos internos/externos.",
+      "evidence": {
+        "source": "Delimitación de alcance"
+      }
+    }
+  ]
+}

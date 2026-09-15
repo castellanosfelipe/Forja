@@ -12,6 +12,14 @@ afterEach(() => {
 });
 
 describe('MetricsPage history consistency', () => {
+  it('prefills the newest weight, including a later dashboard entry', () => {
+    const value = fixture();
+    value.bodyWeight.entries.push({ id: 'latest', measuredAt: '2026-09-14T12:00:00Z', weightKg: 75, note: null });
+    useStateStore.setState({ state: value });
+    render(<MetricsPage />);
+    expect((screen.getByRole('spinbutton', { name: 'Peso kg' }) as HTMLInputElement).value).toBe('75');
+  });
+
   it('removes the weight entry generated together with a deleted body measurement', async () => {
     const user = userEvent.setup();
     const value = fixture();

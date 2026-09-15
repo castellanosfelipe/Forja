@@ -218,7 +218,7 @@ function EquipmentStep({ titleRef, form, setForm }: FormStepProps) {
   const options: Array<{ value: TrainingEquipment; title: string; text: string }> = [
     { value: 'full-gym', title: 'Gimnasio completo', text: 'Barras, mancuernas, poleas y máquinas.' },
     { value: 'free-weights', title: 'Peso libre', text: 'Barras, mancuernas, banco y rack.' },
-    { value: 'bodyweight', title: 'Peso corporal', text: 'Movimientos sin cargas externas; barra de dominadas opcional.' },
+    { value: 'bodyweight', title: 'Peso corporal con barra', text: 'Necesitas barra de dominadas, apoyo estable, anclaje para curl nórdico y discos deslizantes. Incluye una mancuerna para las elevaciones de talón.' },
   ];
   return <div className="onboarding-step"><span className="step-icon"><Dumbbell /></span><p className="eyebrow">Recursos disponibles</p><h1 id="onboarding-title" ref={titleRef} tabIndex={-1}>¿Con qué vas a entrenar?</h1><p>FORJA elegirá variantes presentes en tu biblioteca que correspondan al entorno.</p><div className="choice-grid equipment-grid">{options.map((option) => <ChoiceCard key={option.value} selected={form.equipment === option.value} title={option.title} text={option.text} onClick={() => setForm({ ...form, equipment: option.value })} />)}</div></div>;
 }

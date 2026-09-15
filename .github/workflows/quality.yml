@@ -1,0 +1,44 @@
+name: Quality gates
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - run: npm ci --prefix backend
+      - run: npm ci --prefix frontend
+      - run: npm run typecheck --prefix backend
+      - run: npm test --prefix backend
+      - run: npm run build --prefix backend
+      - run: npm run typecheck --prefix frontend
+      - run: npm test --prefix frontend
+      - run: npm run build --prefix frontend
+      - run: node scripts/qa/verify-precache.mjs
+      - run: node --test scripts/ops/data-snapshot.test.mjs
+      - run: npm audit --omit=dev --audit-level=high --prefix backend
+      - run: npm audit --omit=dev --audit-level=high --prefix frontend
+  containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --prefix backend
+      - run: node scripts/qa/compose-smoke.mjs

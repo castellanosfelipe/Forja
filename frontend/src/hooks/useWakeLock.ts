@@ -8,13 +8,19 @@ export function useWakeLock(enabled: boolean) {
     if (!enabled || !supported) return;
     let sentinel: WakeLockSentinel | null = null;
     let disposed = false;
+    let acquiring = false;
+
+    const release = (lock: WakeLockSentinel) => {
+      if (!lock.released) void lock.release().catch(() => undefined);
+    };
 
     const acquire = async () => {
-      if (document.visibilityState !== 'visible' || disposed || (sentinel && !sentinel.released)) return;
+      if (document.visibilityState !== 'visible' || disposed || acquiring || (sentinel && !sentinel.released)) return;
+      acquiring = true;
       try {
         const requestedSentinel = await navigator.wakeLock.request('screen');
-        if (disposed) {
-          if (!requestedSentinel.released) void requestedSentinel.release();
+        if (disposed || document.visibilityState !== 'visible') {
+          release(requestedSentinel);
           return;
         }
         sentinel = requestedSentinel;
@@ -25,7 +31,9 @@ export function useWakeLock(enabled: boolean) {
         }, { once: true });
       } catch {
         sentinel = null;
-        setActive(false);
+        if (!disposed) setActive(false);
+      } finally {
+        acquiring = false;
       }
     };
     const onVisibility = () => {
@@ -36,7 +44,7 @@ export function useWakeLock(enabled: boolean) {
     return () => {
       disposed = true;
       document.removeEventListener('visibilitychange', onVisibility);
-      if (sentinel && !sentinel.released) void sentinel.release();
+      if (sentinel) release(sentinel);
       sentinel = null;
       setActive(false);
     };

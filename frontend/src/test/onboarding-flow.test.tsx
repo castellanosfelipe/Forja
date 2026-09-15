@@ -28,11 +28,11 @@ describe('flujo de configuración inicial', () => {
   it('no reaparece tras completarse y puede abrirse desde el icono superior', async () => {
     const user = userEvent.setup();
     const completedState = fixture(true);
-    useStateStore.setState({ state: completedState, status: 'idle', load: vi.fn(async () => undefined) });
     useAuthStore.setState({
       status: 'authenticated',
       user: { id: 'user', username: 'forjador', displayName: 'Usuario FORJA', createdAt: new Date().toISOString(), passkeys: [], passwordEnabled: true },
     });
+    useStateStore.setState({ state: completedState, status: 'idle', load: vi.fn(async () => undefined) });
 
     render(<MemoryRouter><AppShell /></MemoryRouter>);
 

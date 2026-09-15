@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { Exercise } from '../../types/state';
 import { getExerciseMedia } from './media/exercise-media';
 import type { ExerciseMediaFrame } from './media/types';
+import { validGuideImage } from './custom-media';
 
 interface ExerciseMediaProps {
   exercise: Exercise;
@@ -10,6 +11,9 @@ interface ExerciseMediaProps {
 }
 
 export function ExerciseMedia({ exercise, compact = false }: ExerciseMediaProps) {
+  if (exercise.guideMedia && validGuideImage(exercise.guideMedia.dataUrl)) {
+    return <MediaImage key={exercise.guideMedia.dataUrl} exerciseName={exercise.name} frame={{ src: exercise.guideMedia.dataUrl, label: 'Secuencia' }} compact={compact} alt={exercise.guideMedia.alt} />;
+  }
   const media = getExerciseMedia(exercise.id);
   if (!media) return <MissingMedia compact={compact} />;
 
@@ -36,7 +40,7 @@ export function ExerciseMedia({ exercise, compact = false }: ExerciseMediaProps)
   );
 }
 
-function MediaImage({ exerciseName, frame, compact = false }: { exerciseName: string; frame: ExerciseMediaFrame; compact?: boolean }) {
+function MediaImage({ exerciseName, frame, compact = false, alt }: { exerciseName: string; frame: ExerciseMediaFrame; compact?: boolean; alt?: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) return <MissingMedia compact={compact} loadFailed />;
 
@@ -44,7 +48,7 @@ function MediaImage({ exerciseName, frame, compact = false }: { exerciseName: st
     <img
       className={`exercise-media-image${compact ? ' compact' : ''}`}
       src={frame.src}
-      alt={compact ? '' : `${exerciseName}: ${frame.label.toLowerCase()}`}
+      alt={compact ? '' : alt ?? `${exerciseName}: ${frame.label.toLowerCase()}`}
       loading="lazy"
       decoding="async"
       onError={() => setFailed(true)}

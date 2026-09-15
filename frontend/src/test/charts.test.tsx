@@ -6,6 +6,17 @@ import { MuscleMap, calculateRecentMuscleScores } from '../components/muscle-map
 import type { Exercise, WorkoutSession } from '../types/state';
 
 describe('dashboard charts', () => {
+  it('positions weight points by elapsed time instead of entry index', () => {
+    const view = render(<WeightChart targetKg={null} entries={[
+      { id: 'a', measuredAt: '2026-01-01T12:00:00Z', weightKg: 82, note: null },
+      { id: 'b', measuredAt: '2026-01-02T12:00:00Z', weightKg: 81, note: null },
+      { id: 'c', measuredAt: '2026-09-09T12:00:00Z', weightKg: 80, note: null },
+    ]} />);
+    const xs = [...view.container.querySelectorAll('.weight-point')].map((point) => Number(point.getAttribute('cx')));
+    expect(xs[1]! - xs[0]!).toBeLessThan((xs[2]! - xs[1]!) / 10);
+    expect(xs.every(Number.isFinite)).toBe(true);
+  });
+
   it('offers named HTML controls and a textual alternative for every weight point', () => {
     const view = render(<WeightChart targetKg={78} entries={[
       { id: 'a', measuredAt: '2026-08-17T11:00:00.000Z', weightKg: 82.4, note: null },

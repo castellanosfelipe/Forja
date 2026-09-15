@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-09-15T13:45:43.142Z",
+  "result": "PASS",
+  "precacheEntries": 24,
+  "executableAssets": 19,
+  "javascriptChunks": 18,
+  "offlineAssetResponses": 23,
+  "offlineNavigation": "PASS",
+  "apiBypass": "PASS",
+  "cacheNames": ["forja-shell-79e75dcb74b8"],
+  "scope": "Compiled worker and actual dist files in an isolated VM; not a native-browser installation test."
+}

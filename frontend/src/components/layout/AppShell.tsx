@@ -144,9 +144,9 @@ export function AppShell() {
             )}
             {status === 'conflict' && <>
               <button type="button" onClick={() => void flush()}><RefreshCw size={15} /> Volver a intentar</button>
-              <button type="button" onClick={exportLocalCopy}><Download size={15} /> Guardar una copia</button>
               <button type="button" onClick={() => { setReplaceFailure(null); setConfirmUseServer(true); }}>Descartar cambios de este dispositivo</button>
             </>}
+            {hasPendingChanges && <button type="button" onClick={exportLocalCopy}><Download size={15} /> Guardar una copia</button>}
             {error && <button type="button" className="icon-button" onClick={clearError} aria-label="Cerrar aviso">×</button>}
           </div>
         )}

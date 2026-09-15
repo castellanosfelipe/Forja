@@ -8,6 +8,8 @@ import type { SessionService } from '../../services/session.service.js';
 import type { WebAuthnService } from '../../services/webauthn.service.js';
 import type { PasswordAuthService } from '../../services/password-auth.service.js';
 import { badRequest, conflict } from '../errors.js';
+import type { PushService } from '../../services/push.service.js';
+import { objectBody, stringField } from '../../utils/validation.js';
 
 interface AuthRouteDependencies {
   database: DatabaseRepository;
@@ -15,53 +17,54 @@ interface AuthRouteDependencies {
   sessions: SessionService;
   webauthn: WebAuthnService;
   passwords: PasswordAuthService;
+  push: PushService;
 }
 
 export function registerAuthRoutes(router: Router, dependencies: AuthRouteDependencies): void {
-  const { database, states, sessions, webauthn, passwords } = dependencies;
+  const { database, states, sessions, webauthn, passwords, push } = dependencies;
 
   router.add('POST', '/api/auth/password/register', async ({ request, response }) => {
     if (await sessions.optionalUser(request)) throw conflict('Cierra la sesión actual antes de crear otra cuenta');
     const user = await passwords.register(await readJsonBody(request));
     await states.getOrCreate(user);
-    sessions.createSession(response, user.id);
+    await sessions.createSession(response, user.id);
     json(response, 201, { user: publicUser(user) });
   });
 
   router.add('POST', '/api/auth/password/login', async ({ request, response }) => {
     const user = await passwords.login(await readJsonBody(request), clientKey(request));
-    sessions.createSession(response, user.id);
+    await sessions.createSession(response, user.id);
     json(response, 200, { user: publicUser(user) });
   });
 
   router.add('POST', '/api/auth/register/options', async ({ request, response }) => {
     const user = await sessions.optionalUser(request);
     const result = await webauthn.beginRegistration(await readJsonBody(request), user);
-    sessions.createAuthFlow(response, result.flow);
+    await sessions.createAuthFlow(response, result.flow);
     json(response, 200, result.options);
   });
 
   router.add('POST', '/api/auth/register/verify', async ({ request, response }) => {
-    const flow = sessions.consumeAuthFlow(request, response);
+    const flow = await sessions.consumeAuthFlow(request, response);
     if (flow.kind !== 'registration') throw badRequest('Expected a registration ceremony');
     const currentUser = await sessions.optionalUser(request);
     const user = await webauthn.finishRegistration(await readJsonBody(request), flow, currentUser);
     await states.getOrCreate(user);
-    sessions.createSession(response, user.id);
+    await sessions.createSession(response, user.id);
     json(response, 201, { verified: true, user: publicUser(user) });
   });
 
   router.add('POST', '/api/auth/login/options', async ({ request, response }) => {
     const result = await webauthn.beginAuthentication(await readJsonBody(request));
-    sessions.createAuthFlow(response, result.flow);
+    await sessions.createAuthFlow(response, result.flow);
     json(response, 200, result.options);
   });
 
   router.add('POST', '/api/auth/login/verify', async ({ request, response }) => {
-    const flow = sessions.consumeAuthFlow(request, response);
+    const flow = await sessions.consumeAuthFlow(request, response);
     if (flow.kind !== 'authentication') throw badRequest('Expected an authentication ceremony');
     const user = await webauthn.finishAuthentication(await readJsonBody(request), flow);
-    sessions.createSession(response, user.id);
+    await sessions.createSession(response, user.id);
     json(response, 200, { verified: true, user: publicUser(user) });
   });
 
@@ -72,8 +75,14 @@ export function registerAuthRoutes(router: Router, dependencies: AuthRouteDepend
       : { authenticated: false, user: null });
   });
 
-  router.add('POST', '/api/auth/logout', ({ response }) => {
-    sessions.clearSession(response);
+  router.add('POST', '/api/auth/logout', async ({ request, response }) => {
+    const body = request.headers['content-type'] ? objectBody(await readJsonBody(request)) : {};
+    const endpoint = stringField(body, 'pushEndpoint', { optional: true, max: 2048 });
+    if (endpoint) {
+      const user = await sessions.optionalUser(request);
+      if (user) await push.detachDevice(user, endpoint);
+    }
+    await sessions.clearSession(request, response);
     noContent(response);
   });
 

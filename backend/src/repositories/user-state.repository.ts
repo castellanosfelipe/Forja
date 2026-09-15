@@ -2,8 +2,9 @@ import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { User, UserState } from '../domain/models.js';
 import { GYM_EXERCISE_CATALOG } from '../domain/exercise-catalog.js';
-import { badRequest, conflict } from '../http/errors.js';
+import { badRequest, conflict, serviceUnavailable } from '../http/errors.js';
 import { deepClone, Mutex, readJson, writeJsonAtomic } from '../utils/atomic-json.js';
+import { validateStateDocument } from '../utils/state-validation.js';
 
 export class UserStateRepository {
   private readonly mutexes = new Map<string, Mutex>();
@@ -15,21 +16,18 @@ export class UserStateRepository {
       const path = this.pathFor(user.stateFileKey);
       try {
         await access(path);
-      } catch {
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw serviceUnavailable('No pudimos acceder al archivo de datos guardados');
         await writeJsonAtomic(path, this.createEmptyState(user));
       }
-      const state = await readJson<UserState>(path);
-      const previousStateSignature = JSON.stringify({
-        catalog: state.exerciseLibrary?.map(({ id, category }) => [id, category]) ?? [],
-        reminder: state.bodyMeasurementReminder ?? null,
-        onboarding: state.onboarding ?? null,
-      });
-      const normalized = this.normalizeAndValidate(state, user);
-      const normalizedStateSignature = JSON.stringify({
-        catalog: normalized.exerciseLibrary.map(({ id, category }) => [id, category]),
-        reminder: normalized.bodyMeasurementReminder,
-        onboarding: normalized.onboarding,
-      });
+      let state: UserState;
+      try { state = await readJson<UserState>(path); }
+      catch { throw serviceUnavailable('No pudimos leer el archivo de datos. Se conserva sin cambios para su revisión.'); }
+      const previousStateSignature = JSON.stringify(state);
+      let normalized: UserState;
+      try { normalized = this.normalizeAndValidate(state, user); }
+      catch { throw serviceUnavailable('Tus datos guardados necesitan una revisión. El archivo se conserva sin cambios.'); }
+      const normalizedStateSignature = JSON.stringify(normalized);
       if (normalizedStateSignature !== previousStateSignature) {
         normalized.revision += 1;
         normalized.owner.updatedAt = new Date().toISOString();
@@ -47,6 +45,10 @@ export class UserStateRepository {
         throw conflict(`State revision mismatch; current revision is ${current.revision}`);
       }
       const input = this.normalizeAndValidate(deepClone(candidate) as UserState, user);
+      // Notification subscriptions/timers are owned by their dedicated endpoints.
+      // A stale offline snapshot must never resurrect cancelled server work.
+      input.pushSubscriptions = current.pushSubscriptions;
+      input.restTimers = current.restTimers;
       input.revision = current.revision + 1;
       input.owner.createdAt = current.owner.createdAt;
       input.owner.updatedAt = new Date().toISOString();
@@ -72,8 +74,7 @@ export class UserStateRepository {
 
   private async readOrCreateUnlocked(user: User, path: string): Promise<UserState> {
     try {
-      const state = await readJson<UserState>(path);
-      return this.normalizeAndValidate(state, user);
+      return await this.readValidated(user, path);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
       const state = this.createEmptyState(user);
@@ -82,24 +83,33 @@ export class UserStateRepository {
     }
   }
 
+  private async readValidated(user: User, path: string): Promise<UserState> {
+    try { return this.normalizeAndValidate(await readJson<UserState>(path), user); }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') throw error;
+      console.error(JSON.stringify({level:'error',event:'state_read_failed',userId:user.id,reason:error instanceof Error?error.message:'invalid state'}));
+      throw serviceUnavailable('No pudimos leer tus datos guardados. El archivo se conserva sin cambios; solicita una revisión antes de continuar.');
+    }
+  }
+
   private normalizeAndValidate(state: UserState, user: User): UserState {
     if (!state || typeof state !== 'object' || state.schemaVersion !== 1) {
       throw badRequest('State must use schemaVersion 1');
     }
-    state.revision = Number.isSafeInteger(state.revision) && state.revision > 0 ? state.revision : 1;
-    state.pushSubscriptions ??= [];
-    state.restTimers ??= [];
-    state.bodyMetrics ??= {
+    state.revision ??= 1;
+    if(state.pushSubscriptions===undefined) state.pushSubscriptions = [];
+    if(state.restTimers===undefined) state.restTimers = [];
+    if(state.bodyMetrics===undefined) state.bodyMetrics = {
       profile: { sex: null, ageYears: null, heightCm: null, activityLevel: 'moderate', goal: 'maintain' },
       entries: [],
     };
-    state.bodyMeasurementReminder ??= {
+    if(state.bodyMeasurementReminder===undefined) state.bodyMeasurementReminder = {
       enabled: true,
       intervalMonths: 1,
-      nextDueAt: addOneMonth(state.owner?.createdAt ?? new Date().toISOString()),
+      nextDueAt: addOneMonth(user.createdAt),
       lastNotifiedAt: null,
     };
-    state.onboarding ??= {
+    if(state.onboarding===undefined) state.onboarding = {
       completedAt: null,
       trainingGoal: 'hypertrophy',
       experience: 'beginner',
@@ -111,25 +121,7 @@ export class UserStateRepository {
       generatedAt: null,
       methodologyVersion: 'forja-safe-v1',
     };
-    if (
-      !state.owner ||
-      !state.bodyWeight ||
-      !Array.isArray(state.bodyWeight.entries) ||
-      !state.bodyMetrics ||
-      !state.bodyMetrics.profile ||
-      !Array.isArray(state.bodyMetrics.entries) ||
-      !Array.isArray(state.onboarding.priorityMuscles) ||
-      !Array.isArray(state.onboarding.limitations) ||
-      !Array.isArray(state.exerciseLibrary) ||
-      !Array.isArray(state.scheduleOverrides) ||
-      !Array.isArray(state.workoutSessions) ||
-      !state.progression ||
-      !Array.isArray(state.progression.exerciseRules) ||
-      !Array.isArray(state.pushSubscriptions) ||
-      !Array.isArray(state.restTimers)
-    ) {
-      throw badRequest('State document is missing required collections');
-    }
+    validateStateDocument(state);
     if (state.owner.userId !== user.id || state.owner.stateFileKey !== user.stateFileKey) {
       throw badRequest('State owner does not match the authenticated user');
     }

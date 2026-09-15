@@ -1,17 +1,18 @@
-const SHELL_CACHE = 'forja-shell-v3';
+const SHELL_CACHE = 'forja-shell-v4';
 const MEDIA_CACHE = 'forja-exercise-media-v1';
 const ACTIVE_CACHES = new Set([SHELL_CACHE, MEDIA_CACHE]);
-const SHELL = ['/', '/manifest.webmanifest'];
+const SHELL = self.__FORJA_PRECACHE || ['/', '/manifest.webmanifest'];
+const offlineFallback = () => new Response('No hay conexión. Abre FORJA con conexión una vez para guardar lo necesario.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL)));
-  self.skipWaiting();
+  // Keep the active version and its lazy chunks until its tabs have closed.
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => !ACTIVE_CACHES.has(key)).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('forja-') && !ACTIVE_CACHES.has(key)).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
@@ -24,12 +25,15 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(SHELL_CACHE).then((cache) => cache.put('/', copy));
-          return response;
+        .then(async (response) => {
+          if (response.ok && !response.redirected && response.headers.get('Content-Type')?.includes('text/html')) {
+            const cache = await caches.open(SHELL_CACHE);
+            await cache.put('/', response.clone()).catch(() => undefined);
+            return response;
+          }
+          return response.ok ? response : (await caches.match('/')) || response;
         })
-        .catch(() => caches.match('/')),
+        .catch(async () => (await caches.match('/')) || offlineFallback()),
     );
     return;
   }
@@ -38,20 +42,25 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       caches.open(MEDIA_CACHE).then(async (cache) => {
         const cached = await cache.match(request);
-        if (cached) return cached;
-        const response = await fetch(request);
-        if (response.ok) await cache.put(request, response.clone());
-        return response;
+        try {
+          const response = await fetch(request, { cache: 'no-cache' });
+          if (response.ok) await cache.put(request, response.clone()).catch(() => undefined);
+          if (response.status >= 500 && cached) return cached;
+          return response;
+        } catch (error) {
+          if (cached) return cached;
+          throw error;
+        }
       }),
     );
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+    caches.match(request).then((cached) => cached || fetch(request).then(async (response) => {
       if (response.ok && ['script', 'style', 'font', 'image'].includes(request.destination)) {
-        const copy = response.clone();
-        caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy));
+        const cache = await caches.open(SHELL_CACHE);
+        await cache.put(request, response.clone()).catch(() => undefined);
       }
       return response;
     })),
@@ -73,7 +82,8 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = new URL(event.notification.data?.url ?? '/workout', self.location.origin).href;
+  const requestedUrl = new URL(event.notification.data?.url ?? '/workout', self.location.origin);
+  const targetUrl = requestedUrl.origin === self.location.origin ? requestedUrl.href : new URL('/workout', self.location.origin).href;
   event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
     const existing = clients.find((client) => client.url.startsWith(self.location.origin));
     if (existing) {

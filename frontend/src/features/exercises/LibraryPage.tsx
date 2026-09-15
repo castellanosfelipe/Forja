@@ -6,6 +6,8 @@ import { EXERCISE_CATEGORIES, exerciseCategory } from './exercise-categories';
 import { MuscleMultiSelect } from './MuscleMultiSelect';
 import { ExerciseMedia } from './ExerciseMedia';
 import { ExerciseGuideDialog } from './ExerciseGuideDialog';
+import { GuideImageField } from './GuideImageField';
+import { checkGuideCapacity, type CustomGuide } from './custom-media';
 
 const PAGE_SIZE = 24;
 
@@ -16,6 +18,8 @@ export function LibraryPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [savingExercise, setSavingExercise] = useState(false);
+  const [preparingImage, setPreparingImage] = useState(false);
+  const [guideMedia, setGuideMedia] = useState<CustomGuide>();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [notice, setNotice] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -62,6 +66,13 @@ export function LibraryPage() {
 
   async function addExercise(event: FormEvent) {
     event.preventDefault();
+    if (savingExercise || preparingImage) return;
+    if (!guideMedia?.alt.trim()) {
+      setFormError('Añade una imagen del ejercicio y describe el movimiento.');
+      return;
+    }
+    try { checkGuideCapacity(library, guideMedia); }
+    catch (error) { setFormError((error as Error).message); return; }
     if (form.primary.length === 0) {
       setFormError('Selecciona al menos un músculo principal.');
       return;
@@ -89,6 +100,7 @@ export function LibraryPage() {
         isBodyweight: form.bodyweight,
         isPerSide: form.perSide,
         muscles: { primary: form.primary, secondary: form.secondary },
+        guideMedia: { ...guideMedia, alt: guideMedia.alt.trim() },
       });
       if (form.measurement === 'repetitions') draft.progression.exerciseRules.push({
         exerciseId: id,
@@ -99,6 +111,7 @@ export function LibraryPage() {
           deloadPercent: 10,
           sets: 3,
           targetReps: 5,
+          ...(form.strategy === 'greyskull-lp' ? { amrapSetNumber: 3 } : {}),
           ...(form.strategy === 'double-progression' ? { repRange: { min: 8, max: 12 } } : {}),
         },
         state: { nextLoadKg: 0, consecutiveFailures: 0, deloadCount: 0, lastEvaluatedSessionId: null },
@@ -106,7 +119,10 @@ export function LibraryPage() {
       });
       setForm({ name: '', category: 'chest', equipment: '', measurement: 'repetitions', bodyweight: false, perSide: false, primary: [], secondary: [], strategy: 'linear-progression' });
       setShowForm(false);
+      setGuideMedia(undefined);
       setNotice('Ejercicio añadido a tu biblioteca.');
+    } catch {
+      setFormError('No pudimos guardar el ejercicio. Revisa la conexión y vuelve a intentarlo; conservamos los datos del formulario.');
     } finally {
       setSavingExercise(false);
     }
@@ -114,7 +130,7 @@ export function LibraryPage() {
 
   return (
     <main className="page library-page">
-      <header className="page-header"><div><p className="eyebrow">Tu vocabulario de movimiento</p><h1>Biblioteca</h1><p>{state.exerciseLibrary.length} ejercicios organizados por zona y tipo de entrenamiento.</p></div><button className="primary-button" type="button" aria-expanded={showForm} aria-controls="exercise-form-panel" onClick={() => setShowForm(!showForm)}><Plus size={19} /> {showForm ? 'Cerrar formulario' : 'Nuevo ejercicio'}</button></header>
+      <header className="page-header"><div><p className="eyebrow">Tu vocabulario de movimiento</p><h1>Biblioteca</h1><p>{state.exerciseLibrary.length} ejercicios organizados por zona y tipo de entrenamiento.</p></div><button className="primary-button" type="button" aria-expanded={showForm} aria-controls="exercise-form-panel" disabled={savingExercise || preparingImage} onClick={() => setShowForm(!showForm)}><Plus size={19} /> {showForm ? 'Cerrar formulario' : 'Nuevo ejercicio'}</button></header>
       {notice && <div className="notice-banner" role="status">{notice}<button className="icon-button" type="button" aria-label="Cerrar confirmación" onClick={() => setNotice(null)}>×</button></div>}
 
       {showForm && <section id="exercise-form-panel" className="content-card exercise-form-card"><div><p className="eyebrow">Personalizado</p><h2>Definir ejercicio</h2><p className="muted">Configura cómo se registra y en qué categoría aparecerá.</p></div><form className="exercise-form" onSubmit={addExercise}>
@@ -122,12 +138,13 @@ export function LibraryPage() {
         <label>Categoría<select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>{EXERCISE_CATEGORIES.slice(0, 16).map((category) => <option key={category.id} value={category.id}>{category.label}</option>)}</select></label>
         <label>Medición<select value={form.measurement} onChange={(event) => setForm({ ...form, measurement: event.target.value as Exercise['measurement'] })}><option value="repetitions">Repeticiones</option><option value="duration">Tiempo</option></select></label>
         <label className="span-2">Equipamiento, separado por comas<input value={form.equipment} onChange={(event) => setForm({ ...form, equipment: event.target.value })} placeholder="barra, discos" /></label>
+        <GuideImageField value={guideMedia} onChange={setGuideMedia} onBusyChange={setPreparingImage} />
         <MuscleMultiSelect id="primary-muscles" label="Músculos principales" selected={form.primary} required invalid={Boolean(formError)} hint="Selecciona uno o varios músculos que reciben la carga principal." onChange={(primary) => { setForm({ ...form, primary, secondary: form.secondary.filter((muscle) => !primary.includes(muscle)) }); setFormError(null); }} />
         <MuscleMultiSelect id="secondary-muscles" label="Músculos secundarios" selected={form.secondary} excluded={form.primary} hint="Solo muestra músculos que no estén seleccionados como principales." onChange={(secondary) => setForm({ ...form, secondary })} />
         {formError && <div className="error-banner span-2" role="alert">{formError}</div>}
         <label>Progresión<select disabled={form.measurement === 'duration'} value={form.strategy} onChange={(event) => setForm({ ...form, strategy: event.target.value as ProgressionStrategy })}><option value="linear-progression">Lineal</option><option value="greyskull-lp">Greyskull · progresión lineal</option><option value="double-progression">Doble progresión</option></select><small>{form.measurement === 'duration' ? 'No aplica a ejercicios por tiempo.' : 'Define cómo aumenta la próxima carga.'}</small></label>
         <div className="toggle-pair"><label><input type="checkbox" checked={form.bodyweight} onChange={(event) => setForm({ ...form, bodyweight: event.target.checked })} /> Peso corporal</label><label><input type="checkbox" checked={form.perSide} onChange={(event) => setForm({ ...form, perSide: event.target.checked })} /> Por lado</label></div>
-        <div className="form-actions span-2"><button type="button" className="secondary-button" disabled={savingExercise} onClick={() => setShowForm(false)}>Cancelar</button><button className="primary-button" type="submit" disabled={savingExercise}>{savingExercise ? 'Guardando…' : 'Añadir a biblioteca'}</button></div>
+        <div className="form-actions span-2"><button type="button" className="secondary-button" disabled={savingExercise || preparingImage} onClick={() => setShowForm(false)}>Cancelar</button><button className="primary-button" type="submit" disabled={savingExercise || preparingImage}>{savingExercise ? 'Guardando…' : 'Añadir a biblioteca'}</button></div>
       </form></section>}
 
       <section className="library-browser" aria-label="Explorar biblioteca">

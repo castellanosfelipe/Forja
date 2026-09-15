@@ -66,7 +66,30 @@ export const authApi = {
     return result.user;
   },
 
-  logout: () => api<void>('/api/auth/logout', { method: 'POST', json: {} }),
+  async logout(): Promise<void> {
+    const pushEndpoint = await endpointForSignOut();
+    await api<void>('/api/auth/logout', { method: 'POST', json: pushEndpoint ? { pushEndpoint } : {} });
+    try { localStorage.removeItem('forja:logout-push-endpoint'); } catch { /* Revocation is already complete. */ }
+  },
   listPasskeys: () => api<{ passkeys: PasskeySummary[] }>('/api/auth/passkeys'),
   removePasskey: (id: string) => api<void>(`/api/auth/passkeys/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 };
+
+async function endpointForSignOut(): Promise<string | null> {
+  let remembered: string | null = null;
+  try { remembered = localStorage.getItem('forja:logout-push-endpoint'); } catch { /* Storage is optional. */ }
+  if (remembered) return remembered;
+  if (!('serviceWorker' in navigator)) return null;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const endpoint = await Promise.race([
+      navigator.serviceWorker.getRegistration().then(async (registration) => (await registration?.pushManager?.getSubscription())?.endpoint ?? null),
+      new Promise<null>((resolve) => { timeout = setTimeout(() => resolve(null), 2_000); }),
+    ]);
+    if (endpoint) {
+      try { localStorage.setItem('forja:logout-push-endpoint', endpoint); } catch { /* Session revocation still proceeds. */ }
+    }
+    return endpoint;
+  } catch { return null; }
+  finally { if (timeout !== undefined) clearTimeout(timeout); }
+}

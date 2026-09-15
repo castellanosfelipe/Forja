@@ -1,0 +1,242 @@
+[
+  {
+    "route": "/",
+    "width": 1440,
+    "height": 900,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1425,
+    "h1": "Hola, qa_visual_20260909.",
+    "title": "Resumen · FORJA",
+    "viewport": 1440
+  },
+  {
+    "route": "/metrics",
+    "width": 1440,
+    "height": 900,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1425,
+    "h1": "Tu cuerpo en contexto.",
+    "title": "Métricas · FORJA",
+    "viewport": 1440
+  },
+  {
+    "route": "/plan",
+    "width": 1440,
+    "height": 900,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1425,
+    "h1": "Forja de masa muscular · 3 días",
+    "title": "Plan semanal · FORJA",
+    "viewport": 1440
+  },
+  {
+    "route": "/library",
+    "width": 1440,
+    "height": 900,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1425,
+    "h1": "Biblioteca",
+    "title": "Biblioteca de ejercicios · FORJA",
+    "viewport": 1440
+  },
+  {
+    "route": "/workout",
+    "width": 1440,
+    "height": 900,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1440,
+    "h1": "¿Qué toca hoy?",
+    "title": "Entrenamiento guiado · FORJA",
+    "viewport": 1440
+  },
+  {
+    "route": "/profile",
+    "width": 1440,
+    "height": 900,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1425,
+    "h1": "Tu espacio",
+    "title": "Perfil · FORJA",
+    "viewport": 1440
+  },
+  {
+    "route": "/",
+    "width": 1280,
+    "height": 800,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1265,
+    "h1": "Hola, qa_visual_20260909.",
+    "title": "Resumen · FORJA",
+    "viewport": 1280
+  },
+  {
+    "route": "/metrics",
+    "width": 1280,
+    "height": 800,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1265,
+    "h1": "Tu cuerpo en contexto.",
+    "title": "Métricas · FORJA",
+    "viewport": 1280
+  },
+  {
+    "route": "/plan",
+    "width": 1280,
+    "height": 800,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1265,
+    "h1": "Forja de masa muscular · 3 días",
+    "title": "Plan semanal · FORJA",
+    "viewport": 1280
+  },
+  {
+    "route": "/library",
+    "width": 1280,
+    "height": 800,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1265,
+    "h1": "Biblioteca",
+    "title": "Biblioteca de ejercicios · FORJA",
+    "viewport": 1280
+  },
+  {
+    "route": "/workout",
+    "width": 1280,
+    "height": 800,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1280,
+    "h1": "¿Qué toca hoy?",
+    "title": "Entrenamiento guiado · FORJA",
+    "viewport": 1280
+  },
+  {
+    "route": "/profile",
+    "width": 1280,
+    "height": 800,
+    "brokenLoadedImages": 0,
+    "documentWidth": 1265,
+    "h1": "Tu espacio",
+    "title": "Perfil · FORJA",
+    "viewport": 1280
+  },
+  {
+    "route": "/",
+    "width": 768,
+    "height": 1024,
+    "brokenLoadedImages": 0,
+    "documentWidth": 911,
+    "h1": "Hola, qa_visual_20260909.",
+    "title": "Resumen · FORJA",
+    "viewport": 768
+  },
+  {
+    "route": "/metrics",
+    "width": 768,
+    "height": 1024,
+    "brokenLoadedImages": 0,
+    "documentWidth": 775,
+    "h1": "Tu cuerpo en contexto.",
+    "title": "Métricas · FORJA",
+    "viewport": 768
+  },
+  {
+    "route": "/plan",
+    "width": 768,
+    "height": 1024,
+    "brokenLoadedImages": 0,
+    "documentWidth": 753,
+    "h1": "Forja de masa muscular · 3 días",
+    "title": "Plan semanal · FORJA",
+    "viewport": 768
+  },
+  {
+    "route": "/library",
+    "width": 768,
+    "height": 1024,
+    "brokenLoadedImages": 0,
+    "documentWidth": 753,
+    "h1": "Biblioteca",
+    "title": "Biblioteca de ejercicios · FORJA",
+    "viewport": 768
+  },
+  {
+    "route": "/workout",
+    "width": 768,
+    "height": 1024,
+    "brokenLoadedImages": 0,
+    "documentWidth": 753,
+    "h1": "¿Qué toca hoy?",
+    "title": "Entrenamiento guiado · FORJA",
+    "viewport": 768
+  },
+  {
+    "route": "/profile",
+    "width": 768,
+    "height": 1024,
+    "brokenLoadedImages": 0,
+    "documentWidth": 753,
+    "h1": "Tu espacio",
+    "title": "Perfil · FORJA",
+    "viewport": 768
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "height": 844,
+    "brokenLoadedImages": 0,
+    "documentWidth": 911,
+    "h1": "Hola, qa_visual_20260909.",
+    "title": "Resumen · FORJA",
+    "viewport": 390
+  },
+  {
+    "route": "/metrics",
+    "width": 390,
+    "height": 844,
+    "brokenLoadedImages": 0,
+    "documentWidth": 775,
+    "h1": "Tu cuerpo en contexto.",
+    "title": "Métricas · FORJA",
+    "viewport": 390
+  },
+  {
+    "route": "/plan",
+    "width": 390,
+    "height": 844,
+    "brokenLoadedImages": 0,
+    "documentWidth": 375,
+    "h1": "Forja de masa muscular · 3 días",
+    "title": "Plan semanal · FORJA",
+    "viewport": 390
+  },
+  {
+    "route": "/library",
+    "width": 390,
+    "height": 844,
+    "brokenLoadedImages": 0,
+    "documentWidth": 375,
+    "h1": "Biblioteca",
+    "title": "Biblioteca de ejercicios · FORJA",
+    "viewport": 390
+  },
+  {
+    "route": "/workout",
+    "width": 390,
+    "height": 844,
+    "brokenLoadedImages": 0,
+    "documentWidth": 375,
+    "h1": "¿Qué toca hoy?",
+    "title": "Entrenamiento guiado · FORJA",
+    "viewport": 390
+  },
+  {
+    "route": "/profile",
+    "width": 390,
+    "height": 844,
+    "brokenLoadedImages": 0,
+    "documentWidth": 375,
+    "h1": "Tu espacio",
+    "title": "Perfil · FORJA",
+    "viewport": 390
+  }
+]

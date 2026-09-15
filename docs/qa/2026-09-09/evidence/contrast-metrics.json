@@ -1,0 +1,118 @@
+{
+  "failures": [],
+  "samples": [
+    {
+      "background": [
+        244,
+        241,
+        232
+      ],
+      "class": "eyebrow",
+      "fontSize": 12,
+      "foreground": "rgb(168, 64, 36)",
+      "pass": true,
+      "ratio": 5.43,
+      "text": "Composición y nutrición",
+      "threshold": 4.5
+    },
+    {
+      "background": [
+        244,
+        241,
+        232
+      ],
+      "class": "",
+      "fontSize": 44.8,
+      "foreground": "rgb(23, 33, 27)",
+      "pass": true,
+      "ratio": 14.64,
+      "text": "Tu cuerpo en contexto.",
+      "threshold": 3
+    },
+    {
+      "background": [
+        244,
+        241,
+        232
+      ],
+      "class": "",
+      "fontSize": 16,
+      "foreground": "rgb(95, 105, 97)",
+      "pass": true,
+      "ratio": 5.05,
+      "text": "Ingresa tus datos una vez: FORJA conecta , grasa corporal, energía y macros.",
+      "threshold": 4.5
+    },
+    {
+      "background": [
+        244,
+        241,
+        232
+      ],
+      "class": "",
+      "fontSize": 16,
+      "foreground": "rgb(95, 105, 97)",
+      "pass": true,
+      "ratio": 5.05,
+      "text": "IMC",
+      "threshold": 4.5
+    },
+    {
+      "background": [
+        233,
+        240,
+        220
+      ],
+      "class": "",
+      "fontSize": 12,
+      "foreground": "rgb(23, 78, 56)",
+      "pass": true,
+      "ratio": 8.23,
+      "text": "mediciones guardadas",
+      "threshold": 4.5
+    },
+    {
+      "background": [
+        233,
+        240,
+        220
+      ],
+      "class": "",
+      "fontSize": 21.6,
+      "foreground": "rgb(23, 78, 56)",
+      "pass": true,
+      "ratio": 8.23,
+      "text": "1",
+      "threshold": 3
+    },
+    {
+      "background": [
+        185,
+        230,
+        110
+      ],
+      "class": "",
+      "fontSize": 12,
+      "foreground": "rgb(23, 78, 56)",
+      "pass": true,
+      "ratio": 6.69,
+      "text": "1",
+      "threshold": 4.5
+    },
+    {
+      "background": [
+        255,
+        253,
+        247
+      ],
+      "class": "",
+      "fontSize": 12,
+      "foreground": "rgb(88, 98, 91)",
+      "pass": true,
+      "ratio": 6.23,
+      "text": "IMC",
+      "threshold": 4.5
+    }
+  ],
+  "total": 88
+}

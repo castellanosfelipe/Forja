@@ -39,6 +39,27 @@ describe('JSON repositories', () => {
     expect(JSON.parse(await readFile(path, 'utf8')).users).toHaveLength(1);
   });
 
+  it('persists session revocation and single-use ceremonies across repository restarts', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'forja-auth-persistence-'));
+    temporaryDirectories.push(directory);
+    const path = join(directory, 'db.json');
+    const first = new DatabaseRepository(path);
+    await first.initialize();
+    await first.createUser(user());
+    const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+    await first.createSession('test-session', user().id, expiresAt);
+    await first.createAuthFlow('test-flow', expiresAt);
+    const second = new DatabaseRepository(path);
+    await second.initialize();
+    expect(await second.hasSession('test-session', user().id)).toBe(true);
+    expect(await second.consumeAuthFlow('test-flow')).toBe(true);
+    await second.revokeSession('test-session');
+    const third = new DatabaseRepository(path);
+    await third.initialize();
+    expect(await third.hasSession('test-session', user().id)).toBe(false);
+    expect(await third.consumeAuthFlow('test-flow')).toBe(false);
+  });
+
   it('creates isolated user state and enforces revisions', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'forja-state-'));
     temporaryDirectories.push(directory);

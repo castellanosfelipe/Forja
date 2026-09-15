@@ -35,8 +35,10 @@ export function WeightChart({ entries, targetKg }: WeightChartProps) {
   const range = Math.max(1, max - min);
   const plotWidth = WIDTH - PADDING.left - PADDING.right;
   const plotHeight = HEIGHT - PADDING.top - PADDING.bottom;
-  const point = (entry: BodyWeightEntry, index: number) => ({
-    x: PADDING.left + (data.length === 1 ? plotWidth / 2 : (index / (data.length - 1)) * plotWidth),
+  const firstTimestamp = Date.parse(data[0]!.measuredAt);
+  const timeSpan = Date.parse(data.at(-1)!.measuredAt) - firstTimestamp;
+  const point = (entry: BodyWeightEntry) => ({
+    x: PADDING.left + (timeSpan <= 0 ? plotWidth / 2 : ((Date.parse(entry.measuredAt) - firstTimestamp) / timeSpan) * plotWidth),
     y: PADDING.top + ((max - entry.weightKg) / range) * plotHeight,
   });
   const points = data.map(point);

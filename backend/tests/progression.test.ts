@@ -42,6 +42,70 @@ function rule(strategy: ExerciseProgressionRule['strategy']): ExerciseProgressio
 }
 
 describe('progression engine', () => {
+  it('completes a legacy session using its recorded rounds and current plan targets instead of a mismatched rule', () => {
+    const progressionRule = rule('double-progression');
+    const recorded = exercise([10, 10]);
+    const state = {
+      workoutSessions: [{ id: 'legacy', planDayId: 'day', status: 'active', exercises: [recorded], completedAt: null }],
+      weeklyPlan: { days: [{ id: 'day', blocks: [{ id: 'pair', type: 'superset', rounds: 3, exercises: [{ exerciseId: recorded.exerciseId, sets: 3, repetitions: { min: 6, max: 10 }, restSeconds: 90 }] }] }] },
+      progression: { exerciseRules: [progressionRule] },
+    } as unknown as UserState;
+    const planBefore = structuredClone(state.weeklyPlan);
+    new ProgressionService().completeSession(state, 'legacy', '2026-09-14T12:00:00Z');
+    expect(recorded.prescription).toEqual({ sets: 2, repetitions: { min: 6, max: 10 }, restSeconds: 90 });
+    expect(progressionRule.state.nextLoadKg).toBe(102.5);
+    expect(state.weeklyPlan).toEqual(planBefore);
+    expect(state.workoutSessions[0]?.status).toBe('completed');
+    new ProgressionService().completeSession(state, 'legacy', '2026-09-14T12:01:00Z');
+    expect(progressionRule.state.nextLoadKg).toBe(102.5);
+  });
+
+  it('never replaces a stored prescription with a later plan revision', () => {
+    const progressionRule = rule('double-progression');
+    const recorded = exercise([10, 10]);
+    recorded.prescription = { sets: 2, repetitions: { min: 6, max: 10 }, restSeconds: 90 };
+    const state = {
+      workoutSessions: [{ id: 'snapshot', planDayId: 'day', status: 'active', exercises: [recorded], completedAt: null }],
+      weeklyPlan: { days: [{ id: 'day', blocks: [{ exercises: [{ exerciseId: recorded.exerciseId, sets: 4, repetitions: { min: 12, max: 15 }, restSeconds: 180 }] }] }] },
+      progression: { exerciseRules: [progressionRule] },
+    } as unknown as UserState;
+    new ProgressionService().completeSession(state, 'snapshot', '2026-09-14T12:00:00Z');
+    expect(recorded.prescription.sets).toBe(2);
+    expect(recorded.prescription.repetitions?.max).toBe(10);
+    expect(progressionRule.state.nextLoadKg).toBe(102.5);
+  });
+
+  it('uses the session prescription over a rule inherited from another day', () => {
+    const planned = exercise([10, 10]);
+    planned.prescription = { sets: 2, repetitions: { min: 6, max: 10 }, restSeconds: 90 };
+    const result = evaluateProgression(rule('double-progression'), planned, 'snapshot');
+    expect(result.succeeded).toBe(true);
+    expect(result.nextState.consecutiveFailures).toBe(0);
+    expect(result.nextState.nextLoadKg).toBe(102.5);
+  });
+
+  it('does not penalize timed exercises with a legacy repetition progression rule', () => {
+    const timed = exercise([null, null], 0);
+    timed.prescription = { sets: 2, durationSeconds: 30, restSeconds: 60 };
+    timed.sets.forEach((set) => { set.durationSeconds = 30; set.completedAt = '2026-09-14T12:00:00Z'; });
+    const previous = rule('linear-progression');
+    previous.state.consecutiveFailures = 1;
+    const result = evaluateProgression(previous, timed, 'timed');
+    expect(result.succeeded).toBe(true);
+    expect(result.deloaded).toBe(false);
+    expect(result.nextState.consecutiveFailures).toBe(0);
+    expect(result.nextState.deloadCount).toBe(0);
+    expect(result.nextState.nextLoadKg).toBe(previous.state.nextLoadKg);
+  });
+
+  it('requires both sides of every prescribed round before increasing load', () => {
+    const oneSided = exercise([5, 5, 5]);
+    oneSided.sets.forEach((set) => { set.side = 'left'; });
+    expect(evaluateProgression(rule('linear-progression'), oneSided, 'missing-right').succeeded).toBe(false);
+    oneSided.sets.push(...oneSided.sets.map((set) => ({ ...set, side: 'right' as const })));
+    expect(evaluateProgression(rule('linear-progression'), oneSided, 'both-sides').succeeded).toBe(true);
+  });
+
   it('calculates Epley estimated 1RM', () => {
     expect(estimateOneRepMax(100, 5)).toBe(116.7);
     expect(estimateOneRepMax(100, 1)).toBe(100);

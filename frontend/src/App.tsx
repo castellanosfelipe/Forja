@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
 import { AuthScreen } from './features/auth/AuthScreen';
-import { DashboardPage } from './features/dashboard/DashboardPage';
-import { LibraryPage } from './features/exercises/LibraryPage';
-import { WorkoutPage } from './features/guided-workout/WorkoutPage';
-import { MetricsPage } from './features/metrics/MetricsPage';
 import { NotFoundPage } from './features/NotFoundPage';
-import { PlanPage } from './features/planning/PlanPage';
-import { ProfilePage } from './features/profile/ProfilePage';
 import { useAuthStore } from './stores/auth.store';
+import { PageSkeleton } from './components/feedback/PageSkeleton';
+
+const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage').then((module) => ({ default: module.DashboardPage })));
+const LibraryPage = lazy(() => import('./features/exercises/LibraryPage').then((module) => ({ default: module.LibraryPage })));
+const WorkoutPage = lazy(() => import('./features/guided-workout/WorkoutPage').then((module) => ({ default: module.WorkoutPage })));
+const MetricsPage = lazy(() => import('./features/metrics/MetricsPage').then((module) => ({ default: module.MetricsPage })));
+const PlanPage = lazy(() => import('./features/planning/PlanPage').then((module) => ({ default: module.PlanPage })));
+const ProfilePage = lazy(() => import('./features/profile/ProfilePage').then((module) => ({ default: module.ProfilePage })));
 
 export default function App() {
   const user = useAuthStore((store) => store.user);
@@ -19,6 +21,9 @@ export default function App() {
 
   useEffect(() => {
     void initialize();
+    const reconnect = () => { if (useAuthStore.getState().logoutPending) void initialize(); };
+    window.addEventListener('online', reconnect);
+    return () => window.removeEventListener('online', reconnect);
   }, [initialize]);
 
   if (status === 'loading') {
@@ -28,6 +33,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageSkeleton />}>
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<DashboardPage />} />
@@ -39,6 +45,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

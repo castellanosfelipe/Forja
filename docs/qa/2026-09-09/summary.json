@@ -1,0 +1,24 @@
+{
+  "baseline": "acda8d39f379a8f1c60956b3be14022eeb692770",
+  "identifiedFunctions": 48,
+  "functionsWithAtLeastOneExecution": 45,
+  "minimumFunctionalCoveragePercent": 93.75,
+  "identifiedCases": 256,
+  "executedCases": 233,
+  "counts": {
+    "PASS": 185,
+    "FAIL": 48,
+    "BLOCKED": 9,
+    "NOT TESTED": 13,
+    "NOT APPLICABLE": 1
+  },
+  "passRatePercent": 79.4,
+  "applicableScenarioExecutionPercent": 91.37,
+  "existingTests": {
+    "frontend": 84,
+    "backend": 18,
+    "total": 102,
+    "status": "PASS",
+    "separateFromAdditionalCases": true
+  }
+}

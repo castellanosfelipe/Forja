@@ -9,6 +9,10 @@ const apiMocks = vi.hoisted(() => ({
 
 vi.mock('../pwa/offline-db', () => ({
   readOfflineValue: vi.fn(async (key: string) => structuredClone(offline.get(key) ?? null)),
+  changeOfflineValues: vi.fn(async (entries: ReadonlyArray<readonly [string, unknown]>, deletes: readonly string[] = []) => {
+    for (const [key, value] of entries) offline.set(key, structuredClone(value));
+    for (const key of deletes) offline.delete(key);
+  }),
   writeOfflineValue: vi.fn(async (key: string, value: unknown) => {
     offline.set(key, structuredClone(value));
   }),
@@ -20,6 +24,7 @@ vi.mock('../pwa/offline-db', () => ({
 vi.mock('../api/state.api', () => ({ stateApi: apiMocks }));
 
 import { rebasePendingState, useStateStore } from '../stores/state.store';
+import { useAuthStore } from '../stores/auth.store';
 
 function state(revision = 1): UserState {
   const now = '2026-08-24T12:00:00.000Z';
@@ -58,6 +63,7 @@ function state(revision = 1): UserState {
 
 describe('state synchronization', () => {
   beforeEach(() => {
+    useAuthStore.setState({ user: { id: 'user', username: 'qa-user', displayName: 'QA', createdAt: '2026-08-24T12:00:00Z', passkeys: [], passwordEnabled: true }, status: 'authenticated' });
     offline.clear();
     apiMocks.get.mockReset();
     apiMocks.replace.mockReset();

@@ -21,7 +21,7 @@ describe('ProfilePage feedback and pending changes', () => {
   it('requires explicit confirmation before closing with changes that are not saved', async () => {
     const user = userEvent.setup();
     const logout = vi.fn(async () => undefined);
-    const reset = vi.fn();
+    const reset = vi.fn(async () => undefined);
     prepareStores({ status: 'conflict', hasPendingChanges: true, logout, reset });
 
     render(<ProfilePage />);
@@ -74,7 +74,7 @@ function prepareStores(options: {
   status?: ReturnType<typeof useStateStore.getState>['status'];
   hasPendingChanges?: boolean;
   logout?: () => Promise<void>;
-  reset?: () => void;
+  reset?: () => Promise<void>;
 } = {}) {
   const now = new Date().toISOString();
   useAuthStore.setState({
@@ -87,7 +87,7 @@ function prepareStores(options: {
     status: options.status ?? 'idle',
     error: null,
     hasPendingChanges: options.hasPendingChanges ?? false,
-    reset: options.reset ?? vi.fn(),
+    reset: options.reset ?? vi.fn(async () => undefined),
   });
 }
 

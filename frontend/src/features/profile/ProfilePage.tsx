@@ -85,7 +85,7 @@ export function ProfilePage() {
   async function signOut() {
     setBusy(true);
     try {
-      reset();
+      await reset().catch(() => undefined);
       await logout();
     } finally {
       setBusy(false);

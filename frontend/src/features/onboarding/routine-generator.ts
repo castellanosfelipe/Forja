@@ -82,7 +82,10 @@ export function generateRoutine(profile: OnboardingProfile, exercises: Exercise[
   const schedule = SCHEDULES[profile.trainingDaysPerWeek];
   const maximumExercises = profile.sessionMinutes <= 30 ? 4 : profile.sessionMinutes <= 45 ? 5 : profile.sessionMinutes <= 60 ? 6 : profile.sessionMinutes <= 75 ? 7 : 8;
   const days = schedule.sessions.map((session, index) => createDay(session, schedule.weekdays[index] ?? 1, profile, library, maximumExercises, context));
-  const uniqueExerciseIds = [...new Set(days.flatMap((day) => day.blocks.flatMap((block) => block.exercises.map((item) => item.exerciseId))))];
+  const firstPrescriptions = new Map<string, ExercisePrescription>();
+  for (const item of days.flatMap((day) => day.blocks.flatMap((block) => block.exercises))) {
+    if (!firstPrescriptions.has(item.exerciseId)) firstPrescriptions.set(item.exerciseId, item);
+  }
   return {
     plan: {
       id: `forja-${profile.trainingGoal}-${effectiveFrom}`,
@@ -90,8 +93,10 @@ export function generateRoutine(profile: OnboardingProfile, exercises: Exercise[
       effectiveFrom,
       days,
     },
-    progressionRules: uniqueExerciseIds.map((exerciseId) => progressionRule(exerciseId, profile, library.get(exerciseId))),
-    exerciseCount: uniqueExerciseIds.length,
+    progressionRules: [...firstPrescriptions.values()]
+      .filter((item) => !item.durationSeconds)
+      .map((item) => progressionRule(item, profile, library.get(item.exerciseId))),
+    exerciseCount: firstPrescriptions.size,
   };
 }
 
@@ -99,12 +104,19 @@ function createDay(session: SessionKind, weekday: number, profile: OnboardingPro
   const source = TEMPLATES[session];
   let ids = source.exercises[profile.equipment].map((id) => substitute(id, profile, library));
   ids = ids.filter((id, index) => library.has(id) && ids.indexOf(id) === index);
-  for (const priority of profile.priorityMuscles) {
-    const id = substitute(PRIORITY_ACCESSORIES[priority][profile.equipment], profile, library);
-    if (library.has(id) && !ids.includes(id)) ids.push(id);
-  }
-  ids = ids.slice(0, maximumExercises);
+  const priorities = [...new Set(profile.priorityMuscles
+    .map((priority) => substitute(PRIORITY_ACCESSORIES[priority][profile.equipment], profile, library))
+    .filter((id) => library.has(id)))];
+  ids = [...new Set([...ids.slice(0, 1), ...priorities, ...ids.slice(1)])].slice(0, maximumExercises);
   const prescriptions = ids.map((id, index) => prescription(library.get(id)!, index, profile, context));
+  const budgetSeconds = profile.sessionMinutes * 60;
+  while (estimateRoutineSeconds(blocksFor(prescriptions, profile), library) > budgetSeconds) {
+    const reducible = [...prescriptions].reverse().find((item) => item.sets > 2);
+    if (reducible) { reducible.sets -= 1; continue; }
+    if (prescriptions.length <= 2) break;
+    const removable = prescriptions.findLastIndex((item, index) => index > 0 && !priorities.includes(item.exerciseId));
+    prescriptions.splice(removable >= 0 ? removable : prescriptions.length - 1, 1);
+  }
   return {
     id: `generated-${weekday}-${session}`,
     weekday,
@@ -113,22 +125,38 @@ function createDay(session: SessionKind, weekday: number, profile: OnboardingPro
   };
 }
 
+/** Conservative working-time estimate: upper rep range, both sides, rests, warm-up and setup. */
+export function estimateRoutineSeconds(blocks: PlanBlock[], library: Map<string, Exercise>): number {
+  return 300 + blocks.reduce((total, block) => {
+    const work = block.exercises.reduce((sum, item) => {
+      const tempo = item.tempo;
+      const secondsPerRep = tempo ? tempo.eccentricSeconds + tempo.pauseSeconds + tempo.concentricSeconds : 3;
+      const movementSeconds = item.durationSeconds ?? (item.repetitions?.max ?? 1) * secondsPerRep;
+      const sides = library.get(item.exerciseId)?.isPerSide ? 2 : 1;
+      return sum + movementSeconds * sides * item.sets + (block.type === 'standard' ? Math.max(0, item.sets - 1) * item.restSeconds : 0);
+    }, 0);
+    const roundRest = block.type === 'superset' ? Math.max(0, (block.rounds ?? 1) - 1) * (block.restAfterRoundSeconds ?? 0) : 0;
+    return total + work + roundRest + block.exercises.length * 45;
+  }, 0);
+}
+
 function blocksFor(prescriptions: ExercisePrescription[], profile: OnboardingProfile): PlanBlock[] {
   const canSuperset = profile.experience !== 'beginner' && profile.trainingGoal !== 'strength' && prescriptions.length >= 5;
   if (!canSuperset) return prescriptions.map((item, index) => ({ id: `block-${index + 1}`, type: 'standard', exercises: [item] }));
   const standard = prescriptions.slice(0, -2).map((item, index) => ({ id: `block-${index + 1}`, type: 'standard' as const, exercises: [item] }));
-  const accessories = prescriptions.slice(-2).map((item) => ({ ...item, restSeconds: 0 }));
-  return [...standard, { id: 'accessory-superset', type: 'superset', rounds: accessories[0]?.sets ?? 2, restAfterRoundSeconds: 90, exercises: accessories }];
+  const rounds = Math.min(...prescriptions.slice(-2).map((item) => item.sets));
+  const accessories = prescriptions.slice(-2).map((item) => ({ ...item, sets: rounds, restSeconds: 0 }));
+  return [...standard, { id: 'accessory-superset', type: 'superset', rounds, restAfterRoundSeconds: 90, exercises: accessories }];
 }
 
 function prescription(exercise: Exercise, index: number, profile: OnboardingProfile, context: RoutineContext): ExercisePrescription {
   const compound = index < 3 && !['biceps', 'triceps', 'forearms', 'calves', 'core', 'mobility'].includes(exercise.category);
   const experienceVolumeAdjustment = profile.experience === 'beginner' ? -1 : 0;
   const recoveryAdjustment = (context.ageYears ?? 0) >= 55 ? -1 : 0;
-  const baseSets = profile.trainingGoal === 'strength' && compound ? 4 : compound ? 3 : 3;
+  const baseSets = 3;
   const sets = Math.max(2, baseSets + experienceVolumeAdjustment + recoveryAdjustment);
   const repetitions = profile.trainingGoal === 'strength' && compound
-    ? { min: 4, max: 6 }
+    ? { min: 5, max: 5 }
     : profile.trainingGoal === 'general-fitness'
       ? { min: 8, max: 12 }
       : compound ? { min: 6, max: 10 } : { min: 10, max: 15 };
@@ -143,14 +171,15 @@ function prescription(exercise: Exercise, index: number, profile: OnboardingProf
   return { exerciseId: exercise.id, sets, repetitions, restSeconds, targetRpe, tempo, coachingNote: coachingNote(profile) };
 }
 
-function progressionRule(exerciseId: string, profile: OnboardingProfile, exercise?: Exercise): ExerciseProgressionRule {
+function progressionRule(item: ExercisePrescription, profile: OnboardingProfile, exercise?: Exercise): ExerciseProgressionRule {
+  const exerciseId = item.exerciseId;
   const strategy = profile.experience === 'beginner'
     ? 'linear-progression'
-    : profile.trainingGoal === 'strength' ? 'greyskull-lp' : 'double-progression';
+    : profile.trainingGoal === 'strength' && item.repetitions?.min === 5 ? 'greyskull-lp' : 'double-progression';
   const incrementKg = exercise?.isBodyweight ? 1 : ['quadriceps', 'hamstrings', 'glutes', 'back'].includes(exercise?.category ?? '') ? 2.5 : 1;
   const config = strategy === 'double-progression'
-    ? { incrementKg, deloadAfterFailures: 3, deloadPercent: 10, repRange: { min: 8, max: 12 } }
-    : { incrementKg, deloadAfterFailures: 3, deloadPercent: 10, sets: 3, targetReps: profile.trainingGoal === 'strength' ? 5 : 10 };
+    ? { incrementKg, deloadAfterFailures: 3, deloadPercent: 10, sets: item.sets, repRange: { ...item.repetitions! } }
+    : { incrementKg, deloadAfterFailures: 3, deloadPercent: 10, sets: item.sets, targetReps: item.repetitions?.min ?? 5, ...(strategy === 'greyskull-lp' ? { amrapSetNumber: item.sets } : {}) };
   return { exerciseId, strategy, config, state: { nextLoadKg: 0, consecutiveFailures: 0, deloadCount: 0, lastEvaluatedSessionId: null } };
 }
 

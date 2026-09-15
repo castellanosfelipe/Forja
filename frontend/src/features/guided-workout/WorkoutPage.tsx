@@ -15,6 +15,7 @@ import { userFacingError } from '../../utils/user-facing-error';
 import { ExerciseMedia } from '../exercises/ExerciseMedia';
 import { ExerciseGuideDialog } from '../exercises/ExerciseGuideDialog';
 import { Abbreviation } from '../../components/feedback/Abbreviation';
+import { nextWorkoutStep, sessionExercisesWithContext } from './workout-flow';
 
 export function WorkoutPage() {
   const state = useStateStore((store) => store.state);
@@ -31,11 +32,11 @@ export function WorkoutPage() {
   const wakeLockEnabled = Boolean(active && state?.preferences.guidedWorkout?.requestWakeLock !== false);
   const wakeLock = useWakeLock(wakeLockEnabled);
 
-  const prescriptions = useMemo(() => {
-    if (!state || !active?.planDayId) return new Map<string, ExercisePrescription>();
-    const day = state.weeklyPlan.days.find((candidate) => candidate.id === active.planDayId);
-    return new Map(day?.blocks.flatMap((block) => block.exercises.map((item) => [item.exerciseId, item] as const)) ?? []);
-  }, [active?.planDayId, state]);
+  const contextualExercises = useMemo(() => active
+    ? sessionExercisesWithContext(active, state?.weeklyPlan.days.find((candidate) => candidate.id === active.planDayId))
+    : [], [active, state?.weeklyPlan]);
+  const prescriptions = useMemo(() => new Map(contextualExercises.flatMap((item) => item.prescription
+    ? [[item.exerciseId, { ...item.prescription, exerciseId: item.exerciseId }] as const] : [])), [contextualExercises]);
 
   if (!state) return null;
   const loadedState = state;
@@ -43,13 +44,17 @@ export function WorkoutPage() {
   async function start(day: PlanDay) {
     setStarting(true); setMessage(null);
     try {
-      const prescriptions = day.blocks.flatMap((block) => block.exercises);
-      const previous = await Promise.all(prescriptions.map((item) => stateApi.previousExercise(item.exerciseId).catch(() => ({ exercise: null }))));
-      const exercises = prescriptions.map((prescription, index) => createWorkoutExercise(
+      const prescriptions = day.blocks.flatMap((block) => block.exercises.map((item) => ({
+        prescription: { ...item, sets: block.type === 'superset' ? block.rounds ?? item.sets : item.sets },
+        block: { id: block.id, type: block.type, ...(block.rounds !== undefined ? { rounds: block.rounds } : {}), ...(block.restAfterRoundSeconds !== undefined ? { restAfterRoundSeconds: block.restAfterRoundSeconds } : {}) },
+      })));
+      const previous = await Promise.all(prescriptions.map((item) => stateApi.previousExercise(item.prescription.exerciseId).catch(() => ({ exercise: null }))));
+      const exercises = prescriptions.map(({ prescription, block }, index) => createWorkoutExercise(
         prescription,
         loadedState.exerciseLibrary.find((item) => item.id === prescription.exerciseId)?.isPerSide ?? false,
         previous[index]?.exercise,
         loadedState.preferences.guidedWorkout?.prefillPreviousLoad !== false,
+        block,
       ));
       const session: WorkoutSession = {
         id: crypto.randomUUID(), planDayId: day.id, scheduledDate: localDateKey(), startedAt: new Date().toISOString(), completedAt: null, status: 'active', exercises, notes: null,
@@ -71,14 +76,11 @@ export function WorkoutPage() {
     if (justCompleted) {
       const latest = useStateStore.getState().state;
       const latestSession = latest?.workoutSessions.find((item) => item.id === active?.id);
-      const latestExercise = latestSession?.exercises.find((item) => item.exerciseId === exerciseId);
-      const libraryExercise = latest?.exerciseLibrary.find((item) => item.id === exerciseId);
-      const completedPair = !libraryExercise?.isPerSide || latestExercise?.sets
-        .filter((item) => item.setNumber === setNumber)
-        .every((item) => Boolean(item.completedAt));
-      if (!completedPair) return;
-      const seconds = prescriptions.get(exerciseId)?.restSeconds ?? loadedState.preferences.restTimer?.defaultSeconds ?? 120;
-      void timer.start(seconds);
+      if (!latestSession) return;
+      const day = latest?.weeklyPlan.days.find((item) => item.id === latestSession.planDayId);
+      const step = nextWorkoutStep(sessionExercisesWithContext(latestSession, day), exerciseId, setNumber, loadedState.preferences.restTimer?.defaultSeconds ?? 120);
+      if (step.nextExerciseIndex !== null) setExerciseIndex(step.nextExerciseIndex);
+      if (step.restSeconds > 0) void timer.start(step.restSeconds);
     }
   }
 
@@ -141,9 +143,12 @@ export function WorkoutPage() {
     );
   }
 
-  const current = active.exercises[Math.min(exerciseIndex, active.exercises.length - 1)];
+  const current = contextualExercises[Math.min(exerciseIndex, contextualExercises.length - 1)];
   const exercise = state.exerciseLibrary.find((item) => item.id === current?.exerciseId);
   const rule = state.progression.exerciseRules.find((item) => item.exerciseId === current?.exerciseId);
+  const prescription = current ? prescriptions.get(current.exerciseId) : undefined;
+  const amrapSetNumber = rule?.strategy === 'greyskull-lp'
+    ? Math.min(rule.config.amrapSetNumber ?? prescription?.sets ?? current?.sets.length ?? 1, prescription?.sets ?? current?.sets.length ?? 1) : null;
   const completedSets = active.exercises.reduce((sum, item) => sum + item.sets.filter((set) => set.completedAt).length, 0);
   const totalSets = active.exercises.reduce((sum, item) => sum + item.sets.length, 0);
   const showRpe = state.preferences.guidedWorkout?.showRpe !== false;
@@ -157,6 +162,7 @@ export function WorkoutPage() {
 
       {timer.running && <RestTimer seconds={timer.remaining} onAdd={timer.add} onSkip={() => void timer.cancel()} />}
       {message && <div className="error-banner workout-message" role="alert">{message}</div>}
+      {timer.notificationError && <div className="error-banner workout-message" role="status">{timer.notificationError}</div>}
 
       <section className="workout-stage">
         <aside className="exercise-rail" aria-label="Ejercicios de la sesión">{active.exercises.map((item, index) => { const library = state.exerciseLibrary.find((candidate) => candidate.id === item.exerciseId); const complete = item.sets.every((set) => set.completedAt); return <button type="button" aria-current={index === exerciseIndex ? 'step' : undefined} className={index === exerciseIndex ? 'active' : ''} key={`${item.exerciseId}-${index}`} onClick={() => setExerciseIndex(index)}><span>{complete ? <CheckCircle2 size={17} /> : index + 1}</span><div><strong>{library?.name ?? 'Ejercicio no disponible'}</strong><small>{item.sets.filter((set) => set.completedAt).length}/{item.sets.length} series</small></div></button>; })}</aside>
@@ -164,7 +170,9 @@ export function WorkoutPage() {
         <div className="set-stage">
           <div className="exercise-title"><div className="workout-exercise-heading"><button className="workout-exercise-media" type="button" onClick={() => setShowTechnique(true)} aria-label={`Abrir guía visual de ${exercise.name}`}><ExerciseMedia exercise={exercise} compact /></button><div><p className="eyebrow">Ejercicio {exerciseIndex + 1} de {active.exercises.length}</p><h1>{exercise.name}</h1><div className="tag-row">{exercise.isBodyweight && <span>Peso corporal</span>}{exercise.isPerSide && <span>Por lado</span>}<span>{exercise.measurement === 'duration' ? 'Tiempo' : 'Repeticiones'}</span>{prescriptions.get(exercise.id)?.tempo && <span>Tempo {formatTempo(prescriptions.get(exercise.id)!)}</span>}{prescriptions.get(exercise.id)?.targetRpe && <span>Objetivo <Abbreviation code="RPE" /> {prescriptions.get(exercise.id)?.targetRpe}</span>}</div>{prescriptions.get(exercise.id)?.coachingNote && <p className="coaching-note">{prescriptions.get(exercise.id)?.coachingNote}</p>}<button className="text-link technique-link" type="button" onClick={() => setShowTechnique(true)}><BookOpen size={16} /> Abrir guía visual</button></div></div>{rule && <div className="next-load"><small>Propuesta</small><strong>{rule.state.nextLoadKg} kg</strong><span>{progressionName(rule.strategy)}</span></div>}</div>
           <div className={`sets-header ${metricColumns}`}><span>Serie</span><span>Carga</span><span>{exercise.measurement === 'duration' ? 'Tiempo' : <Abbreviation code="REPS" />}</span>{showRpe && <span className="optional-metric rpe-field"><Abbreviation code="RPE" /></span>}{showRir && <span className="optional-metric rir-field"><Abbreviation code="RIR" /></span>}<span>Hecho</span></div>
-          <div className="sets-list">{current.sets.map((set) => <SetRow key={`${set.setNumber}-${set.side ?? 'both'}`} set={set} exercise={exercise} showRpe={showRpe} showRir={showRir} onSave={(next, justCompleted) => void saveSet(current.exerciseId, set.setNumber, set.side, next, justCompleted)} />)}</div>
+          {prescription?.repetitions && <p className="coaching-note">Objetivo: {prescription.repetitions.min === prescription.repetitions.max ? prescription.repetitions.min : `${prescription.repetitions.min}–${prescription.repetitions.max}`} repeticiones por serie{exercise.isPerSide ? ' y por lado' : ''}.{amrapSetNumber !== null ? ` En la serie ${amrapSetNumber}, registra las repeticiones adicionales que puedas hacer con técnica controlada; detente si la técnica se deteriora.` : ''}</p>}
+          {current.block?.type === 'superset' && <p className="coaching-note">Superserie · {current.block.rounds ?? prescription?.sets} rondas · {current.block.restAfterRoundSeconds ?? 0} segundos entre rondas. Alterna los ejercicios al completar cada serie.</p>}
+          <div className="sets-list">{current.sets.map((set) => <SetRow key={`${current.exerciseId}-${set.setNumber}-${set.side ?? 'both'}`} set={set} exercise={exercise} showRpe={showRpe} showRir={showRir} onSave={(next, justCompleted) => { void saveSet(current.exerciseId, set.setNumber, set.side, next, justCompleted).catch((cause) => setMessage(userFacingError(cause, 'No pudimos guardar la serie. Inténtalo de nuevo.'))); }} />)}</div>
           <div className="exercise-navigation"><button className="secondary-button" type="button" disabled={exerciseIndex === 0} onClick={() => setExerciseIndex((index) => index - 1)}><ArrowLeft size={17} /> Anterior</button>{exerciseIndex < active.exercises.length - 1 ? <button className="primary-button" type="button" onClick={() => setExerciseIndex((index) => index + 1)}>Siguiente <ArrowRight size={17} /></button> : <div className="finish-action"><button className="finish-button" type="button" disabled={starting || completedSets !== totalSets} aria-describedby={completedSets !== totalSets ? 'finish-workout-hint' : undefined} onClick={() => void completeWorkout()}><Trophy size={19} /> {starting ? 'Calculando…' : 'Terminar sesión'}</button>{completedSets !== totalSets && <small id="finish-workout-hint">Completa las {totalSets - completedSets} series pendientes para calcular la progresión.</small>}</div>}</div>
         </div>
       </section>
@@ -181,12 +189,19 @@ export function WorkoutPage() {
   );
 }
 
-export function createWorkoutExercise(prescription: ExercisePrescription, perSide: boolean, previous?: WorkoutExercise | null, prefillPreviousLoad = true): WorkoutExercise {
-  const previousLoad = prefillPreviousLoad ? previous?.sets.find((set) => set.loadKg !== null)?.loadKg ?? 0 : 0;
+export function createWorkoutExercise(prescription: ExercisePrescription, perSide: boolean, previous?: WorkoutExercise | null, prefillPreviousLoad = true, block?: WorkoutExercise['block']): WorkoutExercise {
+  const previousSets = previous?.sets.filter((set) => set.loadKg !== null) ?? [];
+  const previousLoad = (setNumber: number, side: WorkoutSet['side']) => {
+    if (!prefillPreviousLoad) return 0;
+    return previousSets.find((set) => set.setNumber === setNumber && set.side === side)?.loadKg
+      ?? previousSets.find((set) => set.setNumber === setNumber && set.side === null)?.loadKg
+      ?? previousSets.findLast((set) => set.side === side)?.loadKg
+      ?? previousSets.at(-1)?.loadKg ?? 0;
+  };
   const sides: Array<WorkoutSet['side']> = perSide ? ['left', 'right'] : [null];
   const sets = Array.from({ length: prescription.sets }, (_, index) => sides.map((side): WorkoutSet => ({
     setNumber: index + 1,
-    loadKg: previousLoad,
+    loadKg: previousLoad(index + 1, side),
     repetitions: prescription.repetitions?.min ?? null,
     durationSeconds: prescription.durationSeconds ?? null,
     side,
@@ -194,7 +209,8 @@ export function createWorkoutExercise(prescription: ExercisePrescription, perSid
     rir: null,
     completedAt: null,
   }))).flat();
-  return { exerciseId: prescription.exerciseId, sets, estimatedOneRepMaxKg: null, notes: null };
+  const { exerciseId, ...snapshot } = prescription;
+  return { exerciseId, prescription: structuredClone(snapshot), ...(block ? { block: structuredClone(block) } : {}), sets, estimatedOneRepMaxKg: null, notes: null };
 }
 
 function formatTempo(prescription: ExercisePrescription): string {

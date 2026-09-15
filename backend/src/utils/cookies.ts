@@ -20,7 +20,8 @@ export function parseCookies(header: string | undefined): Record<string, string>
       }
       const name = part.slice(0, separator).trim();
       const value = part.slice(separator + 1).trim();
-      return [name, decodeURIComponent(value)];
+      try { return [name, decodeURIComponent(value)]; }
+      catch { return [name, '']; }
     }),
   );
 }

@@ -42,8 +42,8 @@ export function createApplication(config: AppConfig): Application {
       timestamp: new Date().toISOString(),
     });
   });
-  registerAuthRoutes(router, { database, states, sessions, webauthn, passwords });
-  registerStateRoutes(router, sessions, states);
+  registerAuthRoutes(router, { database, states, sessions, webauthn, passwords, push });
+  registerStateRoutes(router, sessions, states, push);
   registerWorkoutRoutes(router, sessions, states, progression);
   registerPushRoutes(router, sessions, push);
 

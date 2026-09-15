@@ -72,7 +72,8 @@ export function MetricsPage() {
       sex: profile.sex ?? '',
       ageYears: profile.ageYears?.toString() ?? '',
       heightCm: profile.heightCm?.toString() ?? '',
-      weightKg: (latestMetric?.weightKg ?? latestWeight?.weightKg)?.toString() ?? '',
+      weightKg: (latestWeight && (!latestMetric || Date.parse(latestWeight.measuredAt) >= Date.parse(latestMetric.measuredAt))
+        ? latestWeight.weightKg : latestMetric?.weightKg)?.toString() ?? '',
       activityLevel: profile.activityLevel,
       goal: profile.goal,
       neckCm: latestMetric?.neckCm?.toString() ?? '',

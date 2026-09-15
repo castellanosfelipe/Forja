@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { randomUUID } from 'node:crypto';
 import type { AppConfig } from '../config/env.js';
 import type { AuthFlowClaims, SessionClaims, User } from '../domain/models.js';
 import { unauthorized } from '../http/errors.js';
@@ -19,11 +20,14 @@ export class SessionService {
     this.tokens = new SignedTokenService(config.sessionSecret);
   }
 
-  public createSession(response: ServerResponse, userId: string): void {
+  public async createSession(response: ServerResponse, userId: string): Promise<void> {
     const now = Math.floor(Date.now() / 1000);
+    const sid = randomUUID();
+    await this.database.createSession(sid, userId, now + this.config.sessionTtlSeconds);
     const token = this.tokens.issue<SessionClaims>({
       kind: 'session',
       sub: userId,
+      sid,
       iat: now,
       exp: now + this.config.sessionTtlSeconds,
     });
@@ -33,15 +37,20 @@ export class SessionService {
     }));
   }
 
-  public clearSession(response: ServerResponse): void {
+  public async clearSession(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    const token = parseCookies(request.headers.cookie)[SESSION_COOKIE];
+    const claims = token ? this.tokens.verify<SessionClaims>(token) : null;
+    if (claims?.kind === 'session' && typeof claims.sid === 'string') await this.database.revokeSession(claims.sid);
     appendSetCookie(response, serializeCookie(SESSION_COOKIE, '', {
       secure: this.config.secureCookies,
       maxAge: 0,
     }));
   }
 
-  public createAuthFlow(response: ServerResponse, claims: AuthFlowClaims): void {
-    const token = this.tokens.issue(claims);
+  public async createAuthFlow(response: ServerResponse, claims: AuthFlowClaims): Promise<void> {
+    const jti = randomUUID();
+    await this.database.createAuthFlow(jti, claims.exp);
+    const token = this.tokens.issue({ ...claims, jti });
     appendSetCookie(response, serializeCookie(AUTH_FLOW_COOKIE, token, {
       secure: this.config.secureCookies,
       maxAge: this.config.authFlowTtlSeconds,
@@ -49,15 +58,15 @@ export class SessionService {
     }));
   }
 
-  public consumeAuthFlow(request: IncomingMessage, response: ServerResponse): AuthFlowClaims {
+  public async consumeAuthFlow(request: IncomingMessage, response: ServerResponse): Promise<AuthFlowClaims> {
     const token = parseCookies(request.headers.cookie)[AUTH_FLOW_COOKIE];
     appendSetCookie(response, serializeCookie(AUTH_FLOW_COOKIE, '', {
       secure: this.config.secureCookies,
       maxAge: 0,
       path: '/api/auth',
     }));
-    const claims = token ? this.tokens.verify<AuthFlowClaims>(token) : null;
-    if (!claims || !['registration', 'authentication'].includes(claims.kind)) {
+    const claims = token ? this.tokens.verify<AuthFlowClaims & { jti: string }>(token) : null;
+    if (!claims || !['registration', 'authentication'].includes(claims.kind) || typeof claims.jti !== 'string' || !await this.database.consumeAuthFlow(claims.jti)) {
       throw unauthorized('Authentication ceremony expired or missing');
     }
     return claims;
@@ -67,7 +76,7 @@ export class SessionService {
     const token = parseCookies(request.headers.cookie)[SESSION_COOKIE];
     if (!token) return null;
     const claims = this.tokens.verify<SessionClaims>(token);
-    if (!claims || claims.kind !== 'session') return null;
+    if (!claims || claims.kind !== 'session' || typeof claims.sid !== 'string' || !await this.database.hasSession(claims.sid, claims.sub)) return null;
     return this.database.findUserById(claims.sub);
   }
 

@@ -1,0 +1,714 @@
+{
+  "date": "2026-09-09",
+  "count": 48,
+  "features": [
+    {
+      "id": "F-01",
+      "module": "Acceso",
+      "component": "AuthScreen / password-auth",
+      "functionality": "Registro por contraseña",
+      "role": "Anónimo",
+      "dependencies": "db.json; scrypt",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-001",
+        "UI-002",
+        "API-034",
+        "API-037"
+      ]
+    },
+    {
+      "id": "F-02",
+      "module": "Acceso",
+      "component": "AuthScreen / password-auth",
+      "functionality": "Login por contraseña",
+      "role": "Anónimo",
+      "dependencies": "cookie; db.json",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-028",
+        "API-039",
+        "API-041"
+      ]
+    },
+    {
+      "id": "F-03",
+      "module": "Acceso",
+      "component": "WebAuthnService",
+      "functionality": "Registro passkey y método adicional",
+      "role": "Anónimo/propietario",
+      "dependencies": "SimpleWebAuthn; RP/origen",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-103",
+        "API-104",
+        "API-114",
+        "API-127"
+      ]
+    },
+    {
+      "id": "F-04",
+      "module": "Acceso",
+      "component": "WebAuthnService",
+      "functionality": "Login passkey y ceremonia de un solo uso",
+      "role": "Anónimo",
+      "dependencies": "firma; challenge; cookie",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-109",
+        "API-110",
+        "API-111",
+        "API-112"
+      ]
+    },
+    {
+      "id": "F-05",
+      "module": "Acceso",
+      "component": "SessionService / auth.store",
+      "functionality": "Cierre de sesión y revocación",
+      "role": "Propietario",
+      "dependencies": "cookie; caché",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-026",
+        "UI-027",
+        "API-124",
+        "PWA-006"
+      ]
+    },
+    {
+      "id": "F-06",
+      "module": "Acceso",
+      "component": "Passkeys routes / ProfilePage",
+      "functionality": "Listar/eliminar métodos sin perder acceso",
+      "role": "Propietario",
+      "dependencies": "db.json",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-105",
+        "API-107",
+        "API-115"
+      ]
+    },
+    {
+      "id": "F-07",
+      "module": "Seguridad",
+      "component": "Router / SessionService",
+      "functionality": "Aislar cuentas y denegar acceso directo",
+      "role": "Usuario/anónimo",
+      "dependencies": "identidad de sesión",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-003",
+        "API-047",
+        "API-048",
+        "API-051",
+        "API-082",
+        "UI-026"
+      ]
+    },
+    {
+      "id": "F-08",
+      "module": "Seguridad",
+      "component": "PasswordAuthService",
+      "functionality": "Limitar intentos y concurrencia de login",
+      "role": "Anónimo",
+      "dependencies": "reloj; memoria",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-071",
+        "API-072"
+      ]
+    },
+    {
+      "id": "F-09",
+      "module": "Datos",
+      "component": "UserStateRepository",
+      "functionality": "Leer/reemplazar estado y validar documento",
+      "role": "Propietario",
+      "dependencies": "JSON; If-Match",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-064",
+        "API-065",
+        "API-073",
+        "API-076",
+        "API-079"
+      ]
+    },
+    {
+      "id": "F-10",
+      "module": "Datos",
+      "component": "Atomic JSON / repositorios",
+      "functionality": "Persistir y recuperar tras reinicio",
+      "role": "Interno",
+      "dependencies": "disco",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-036",
+        "API-119",
+        "API-126"
+      ]
+    },
+    {
+      "id": "F-11",
+      "module": "Datos",
+      "component": "Repositorios / mutex",
+      "functionality": "Evitar duplicados y escrituras concurrentes",
+      "role": "Propietario",
+      "dependencies": "mutex en proceso",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-068",
+        "API-069",
+        "API-070",
+        "API-131"
+      ]
+    },
+    {
+      "id": "F-12",
+      "module": "Configuración",
+      "component": "OnboardingWizard",
+      "functionality": "Solicitar datos iniciales una vez y reabrir",
+      "role": "Propietario",
+      "dependencies": "perfil; estado",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-003",
+        "UI-004",
+        "UI-008",
+        "UI-009"
+      ]
+    },
+    {
+      "id": "F-13",
+      "module": "Configuración",
+      "component": "routine-generator",
+      "functionality": "Generar por objetivo/experiencia/días/tiempo",
+      "role": "Propietario",
+      "dependencies": "catálogo; reglas",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-001",
+        "BUS-002",
+        "BUS-003",
+        "BUS-006"
+      ]
+    },
+    {
+      "id": "F-14",
+      "module": "Configuración",
+      "component": "routine-generator",
+      "functionality": "Aplicar prioridades musculares",
+      "role": "Propietario",
+      "dependencies": "plantillas de rutina",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-005",
+        "BUS-005"
+      ]
+    },
+    {
+      "id": "F-15",
+      "module": "Configuración",
+      "component": "routine-generator",
+      "functionality": "Respetar equipamiento y límites",
+      "role": "Propietario",
+      "dependencies": "catálogo; equipo disponible",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-001",
+        "BUS-026"
+      ]
+    },
+    {
+      "id": "F-16",
+      "module": "Plan",
+      "component": "PlanPage / state",
+      "functionality": "Crear y conservar plan base semanal",
+      "role": "Propietario",
+      "dependencies": "catálogo; estado",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-007",
+        "UI-024",
+        "BUS-021"
+      ]
+    },
+    {
+      "id": "F-17",
+      "module": "Plan",
+      "component": "schedule / PlanPage",
+      "functionality": "Reprogramar una fecha sin alterar base",
+      "role": "Propietario",
+      "dependencies": "fechas locales; overrides",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-024",
+        "BUS-021"
+      ]
+    },
+    {
+      "id": "F-18",
+      "module": "Entrenamiento",
+      "component": "WorkoutPage",
+      "functionality": "Ejecutar superseries y descansos por ronda",
+      "role": "Propietario",
+      "dependencies": "bloques; timer",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-013"
+      ]
+    },
+    {
+      "id": "F-19",
+      "module": "Entrenamiento",
+      "component": "Workout routes / WorkoutPage",
+      "functionality": "Iniciar/reanudar/completar/cancelar sesión",
+      "role": "Propietario",
+      "dependencies": "estado; progresión",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-019",
+        "UI-022",
+        "UI-023",
+        "API-081",
+        "API-085",
+        "API-087",
+        "API-092"
+      ]
+    },
+    {
+      "id": "F-20",
+      "module": "Entrenamiento",
+      "component": "session helpers",
+      "functionality": "Autocompletar cargas y registrar por lado",
+      "role": "Propietario",
+      "dependencies": "sesión previa",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-007",
+        "BUS-008",
+        "BUS-009",
+        "UI-023"
+      ]
+    },
+    {
+      "id": "F-21",
+      "module": "Entrenamiento",
+      "component": "SetRow",
+      "functionality": "Guardar carga/reps/RPE/RIR válidos",
+      "role": "Propietario",
+      "dependencies": "autoguardado; estado",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-015",
+        "BUS-016",
+        "BUS-027",
+        "UI-021"
+      ]
+    },
+    {
+      "id": "F-22",
+      "module": "Progresión",
+      "component": "ProgressionService",
+      "functionality": "Lineal, estancamiento y descarga",
+      "role": "Propietario",
+      "dependencies": "prescripción; historial",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-002",
+        "BUS-010",
+        "BUS-011"
+      ]
+    },
+    {
+      "id": "F-23",
+      "module": "Progresión",
+      "component": "ProgressionService",
+      "functionality": "Doble progresión por máximo de repeticiones",
+      "role": "Propietario",
+      "dependencies": "regla; prescripción",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-003"
+      ]
+    },
+    {
+      "id": "F-24",
+      "module": "Progresión",
+      "component": "ProgressionService",
+      "functionality": "Lógica distintiva AMRAP de Greyskull",
+      "role": "Propietario",
+      "dependencies": "amrapSetNumber",
+      "initialState": "Campo presente; comportamiento distintivo sin validar",
+      "caseIds": [
+        "UI-037"
+      ]
+    },
+    {
+      "id": "F-25",
+      "module": "Progresión",
+      "component": "session helpers / ProgressionService",
+      "functionality": "Tiempo y estimación de 1RM",
+      "role": "Propietario",
+      "dependencies": "sets; fórmulas",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-004",
+        "BUS-012",
+        "API-086"
+      ]
+    },
+    {
+      "id": "F-26",
+      "module": "Métricas",
+      "component": "Dashboard / body-weight routes",
+      "functionality": "Registrar/eliminar peso y meta",
+      "role": "Propietario",
+      "dependencies": "estado; fecha",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "API-050",
+        "API-052",
+        "API-057",
+        "API-063",
+        "UI-007"
+      ]
+    },
+    {
+      "id": "F-27",
+      "module": "Métricas",
+      "component": "calculations / MetricsPage",
+      "functionality": "IMC, energía, grasa, masa magra, macros",
+      "role": "Propietario",
+      "dependencies": "perfil; perímetros",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-017",
+        "BUS-018",
+        "BUS-019",
+        "BUS-020",
+        "UI-011"
+      ]
+    },
+    {
+      "id": "F-28",
+      "module": "Métricas",
+      "component": "MetricsPage",
+      "functionality": "Guardar/consultar/borrar medición corporal",
+      "role": "Propietario",
+      "dependencies": "estado; pesos vinculados",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-011",
+        "UI-012",
+        "UI-013"
+      ]
+    },
+    {
+      "id": "F-29",
+      "module": "Recordatorios",
+      "component": "measurement-reminder / PushService",
+      "functionality": "Recordatorio mensual, posponer y rearmar",
+      "role": "Propietario",
+      "dependencies": "reloj; estado; Push",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-023",
+        "PWA-021",
+        "PWA-023",
+        "UI-011"
+      ]
+    },
+    {
+      "id": "F-30",
+      "module": "Gráficas",
+      "component": "WeightChart",
+      "functionality": "Tendencia y línea de meta temporal",
+      "role": "Propietario",
+      "dependencies": "bodyWeight",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-025",
+        "UI-R19"
+      ]
+    },
+    {
+      "id": "F-31",
+      "module": "Gráficas",
+      "component": "TrainingHeatmap",
+      "functionality": "Constancia anual de 365 días",
+      "role": "Propietario",
+      "dependencies": "sesiones; fechas locales",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-022",
+        "UI-R13"
+      ]
+    },
+    {
+      "id": "F-32",
+      "module": "Gráficas",
+      "component": "MuscleMap / AnatomyFigure",
+      "functionality": "Carga muscular por sexo y estímulo",
+      "role": "Propietario",
+      "dependencies": "perfil; catálogo; sesiones",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "BUS-024",
+        "UI-007"
+      ]
+    },
+    {
+      "id": "F-33",
+      "module": "Biblioteca",
+      "component": "LibraryPage",
+      "functionality": "Buscar/filtrar/categorizar catálogo",
+      "role": "Propietario",
+      "dependencies": "195 ejercicios",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-014",
+        "UI-015"
+      ]
+    },
+    {
+      "id": "F-34",
+      "module": "Biblioteca",
+      "component": "MuscleMultiSelect / LibraryPage",
+      "functionality": "Crear ejercicio y segmentar músculos",
+      "role": "Propietario",
+      "dependencies": "catálogo anatómico; estado",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-016",
+        "UI-017",
+        "UI-018"
+      ]
+    },
+    {
+      "id": "F-35",
+      "module": "Biblioteca",
+      "component": "ExerciseMedia / Guide",
+      "functionality": "Imágenes y guía correspondiente",
+      "role": "Propietario",
+      "dependencies": "341 activos locales",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-015",
+        "UI-018",
+        "UI-031",
+        "PWA-015"
+      ]
+    },
+    {
+      "id": "F-36",
+      "module": "Accesibilidad",
+      "component": "Abbreviation",
+      "functionality": "Explicar siglas con interacción",
+      "role": "Todos",
+      "dependencies": "tooltips; foco",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-010"
+      ]
+    },
+    {
+      "id": "F-37",
+      "module": "Accesibilidad",
+      "component": "Modal / forms / styles",
+      "functionality": "Foco, etiquetas, contraste y teclado",
+      "role": "Todos",
+      "dependencies": "DOM; CSS",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-013",
+        "UI-029",
+        "UI-030",
+        "UI-032"
+      ]
+    },
+    {
+      "id": "F-38",
+      "module": "Interfaz",
+      "component": "AppShell / pages / CSS",
+      "functionality": "Navegación responsive de seis rutas",
+      "role": "Propietario",
+      "dependencies": "React Router; media queries",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-025",
+        "UI-R01",
+        "UI-R02",
+        "UI-R03",
+        "UI-R04",
+        "UI-R05",
+        "UI-R06",
+        "UI-R07",
+        "UI-R08",
+        "UI-R09",
+        "UI-R10",
+        "UI-R11",
+        "UI-R12",
+        "UI-R13",
+        "UI-R14",
+        "UI-R15",
+        "UI-R16",
+        "UI-R17",
+        "UI-R18",
+        "UI-R19",
+        "UI-R20",
+        "UI-R21",
+        "UI-R22",
+        "UI-R23",
+        "UI-R24"
+      ]
+    },
+    {
+      "id": "F-39",
+      "module": "Offline",
+      "component": "state.store / IndexedDB",
+      "functionality": "Leer/editar sin conexión y mantener borrador",
+      "role": "Propietario",
+      "dependencies": "caché por usuario",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-001",
+        "PWA-002",
+        "PWA-004",
+        "PWA-005"
+      ]
+    },
+    {
+      "id": "F-40",
+      "module": "Offline",
+      "component": "state.store",
+      "functionality": "Reconciliar cambios y resolver conflictos",
+      "role": "Propietario",
+      "dependencies": "revision; base; pending",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-003",
+        "PWA-007"
+      ]
+    },
+    {
+      "id": "F-41",
+      "module": "PWA",
+      "component": "service-worker.js",
+      "functionality": "Shell offline y actualización de medios",
+      "role": "Todos",
+      "dependencies": "CacheStorage; Fetch",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-013",
+        "PWA-014",
+        "PWA-015",
+        "PWA-016",
+        "PWA-017"
+      ]
+    },
+    {
+      "id": "F-42",
+      "module": "PWA",
+      "component": "useWakeLock",
+      "functionality": "Mantener pantalla despierta y liberar bloqueo",
+      "role": "Propietario",
+      "dependencies": "SO; navegador; permisos",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-011",
+        "PWA-012",
+        "PWA-030"
+      ]
+    },
+    {
+      "id": "F-43",
+      "module": "PWA",
+      "component": "useRestTimer / PushService",
+      "functionality": "Temporizador, extensión, cancelación y aviso",
+      "role": "Propietario",
+      "dependencies": "VAPID; proveedor",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "UI-020",
+        "BUS-014",
+        "PWA-008",
+        "PWA-009",
+        "PWA-018",
+        "PWA-019",
+        "PWA-029",
+        "API-120"
+      ]
+    },
+    {
+      "id": "F-44",
+      "module": "PWA",
+      "component": "manifest / perfil",
+      "functionality": "Instalar y relanzar en dispositivos reales",
+      "role": "Todos",
+      "dependencies": "SO/navegador",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-031"
+      ]
+    },
+    {
+      "id": "F-45",
+      "module": "Infraestructura",
+      "component": "Compose / Nginx",
+      "functionality": "Origen único, TTL, headers y despliegue",
+      "role": "Operador (no rol de app)",
+      "dependencies": "Docker; TLS; variables",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-026",
+        "PWA-027",
+        "PWA-028",
+        "PWA-034"
+      ]
+    },
+    {
+      "id": "F-46",
+      "module": "Calidad",
+      "component": "package.json / lockfiles",
+      "functionality": "Build y dependencias conocidas",
+      "role": "Operador",
+      "dependencies": "Node; npm",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-024",
+        "PWA-025"
+      ]
+    },
+    {
+      "id": "F-47",
+      "module": "Calidad",
+      "component": "CI / logs / rendimiento",
+      "functionality": "Regresión remota, observabilidad y carga",
+      "role": "Operador",
+      "dependencies": "pipeline; stdout",
+      "initialState": "Implementación/configuración identificada; pendiente de ejecutar al inicio de auditoría",
+      "caseIds": [
+        "PWA-033",
+        "PWA-035",
+        "API-125",
+        "UI-035"
+      ]
+    },
+    {
+      "id": "F-48",
+      "module": "Recuperación",
+      "component": "AppShell / almacenamiento",
+      "functionality": "Exportar/restaurar cuenta y recuperar corrupción",
+      "role": "Propietario/operador",
+      "dependencies": "copia .forja; disco",
+      "initialState": "Exporta borrador en conflicto; restauración no descubierta",
+      "caseIds": [
+        "UI-034",
+        "API-132"
+      ]
+    }
+  ]
+}

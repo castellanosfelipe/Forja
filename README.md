@@ -12,6 +12,8 @@ Cada ejercicio del catálogo base tiene una asignación visual explícita y auto
 
 Exercise data by [RepDB](https://repdb.co). Parte de las imágenes complementarias procede de [Free Exercise DB](https://github.com/yuhonas/free-exercise-db). Las licencias y revisiones empleadas se detallan en [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
+Los ejercicios propios permiten añadir una imagen PNG, JPG o WebP con descripción del movimiento. Se optimiza localmente antes de guardarse; es una referencia del usuario, no una certificación de la técnica.
+
 En el primer acceso, un asistente guiado solicita datos corporales, objetivo, experiencia, disponibilidad, equipamiento, prioridades musculares y movimientos sensibles. Con esa información genera un plan de 2 a 6 días, ajusta volumen, RPE/RIR, tempo y descansos, y configura progresión lineal, Greyskull LP o doble progresión. La metodología toma de los documentos de referencia los principios de tensión mecánica, control excéntrico, recuperación y sobrecarga progresiva, excluyendo automáticamente prácticas de alto riesgo como negativas supramáximas, presses tras nuca y fallo obligatorio. La rutina puede regenerarse desde **Perfil** sin borrar el historial de sesiones.
 
 ## Inicio local
@@ -46,4 +48,4 @@ Antes de exponer el servicio:
 - mantiene `.env` fuera del control de versiones;
 - rota `SESSION_SECRET` y las claves VAPID si se filtran.
 
-La documentación específica está en `backend/README.md` y `frontend/README.md`.
+La documentación específica está en `backend/README.md` y `frontend/README.md`. Consulta también la [guía de producción, copias y recuperación](docs/production.md) y ejecuta sus controles antes de publicar.

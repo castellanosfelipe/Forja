@@ -63,6 +63,12 @@ export function nullableStringField(
 }
 
 export function isoDateTime(value: string, fieldName: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) {
+    throw badRequest(`${fieldName} must be an ISO date-time with a time zone`);
+  }
+  isoDate(value.slice(0, 10), fieldName);
+  const time = value.slice(11, 19).split(':').map(Number);
+  if (time[0]! > 23 || time[1]! > 59 || time[2]! > 59) throw badRequest(`${fieldName} contains an invalid time`);
   const date = new Date(value);
   if (Number.isNaN(date.valueOf()) || !value.includes('T')) {
     throw badRequest(`${fieldName} must be an ISO date-time`);
@@ -71,7 +77,8 @@ export function isoDateTime(value: string, fieldName: string): string {
 }
 
 export function isoDate(value: string, fieldName: string): string {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00.000Z`))) {
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== value) {
     throw badRequest(`${fieldName} must use YYYY-MM-DD`);
   }
   return value;

@@ -1,0 +1,565 @@
+{
+  "auditedAt": "2026-09-09T15:00:00.000Z",
+  "scope": "Independent additional business/data cases, synthetic fixtures only",
+  "counts": {
+    "total": 27,
+    "pass": 12,
+    "fail": 15
+  },
+  "cases": [
+    {
+      "id": "BUS-001",
+      "name": "Routine matrix: all days/equipment/goals/experience resolve catalog exercises",
+      "status": "PASS",
+      "expected": {
+        "combinations": 180,
+        "invalid": []
+      },
+      "observed": {
+        "combinations": 180,
+        "invalid": []
+      },
+      "evidence": "generateRoutine: 180 real-catalog combinations executed"
+    },
+    {
+      "id": "BUS-002",
+      "name": "Perfect beginner session must not count as failure",
+      "status": "FAIL",
+      "expected": {
+        "succeeded": true,
+        "failures": 0
+      },
+      "observed": {
+        "prescription": {
+          "exerciseId": "leg-press",
+          "sets": 2,
+          "repetitions": {
+            "min": 6,
+            "max": 10
+          },
+          "restSeconds": 120,
+          "targetRpe": 7,
+          "tempo": {
+            "eccentricSeconds": 3,
+            "pauseSeconds": 1,
+            "concentricSeconds": 1
+          },
+          "coachingNote": "Técnica estable, sin inercia y 3 repeticiones en reserva. Detén la serie si aparece dolor."
+        },
+        "rule": {
+          "incrementKg": 2.5,
+          "deloadAfterFailures": 3,
+          "deloadPercent": 10,
+          "sets": 3,
+          "targetReps": 10
+        },
+        "result": {
+          "succeeded": false,
+          "deloaded": false,
+          "nextState": {
+            "nextLoadKg": 50,
+            "consecutiveFailures": 1,
+            "deloadCount": 0,
+            "lastEvaluatedSessionId": "qa-1"
+          }
+        }
+      },
+      "evidence": "routine-generator.ts prescription/progressionRule -> progression.service.ts evaluateProgression"
+    },
+    {
+      "id": "BUS-003",
+      "name": "Double progression advances at the prescribed upper range",
+      "status": "FAIL",
+      "expected": {
+        "prescriptionMax": 10,
+        "succeeded": true
+      },
+      "observed": {
+        "prescription": {
+          "exerciseId": "leg-press",
+          "sets": 3,
+          "repetitions": {
+            "min": 6,
+            "max": 10
+          },
+          "restSeconds": 120,
+          "targetRpe": 8,
+          "tempo": {
+            "eccentricSeconds": 3,
+            "pauseSeconds": 1,
+            "concentricSeconds": 1
+          },
+          "coachingNote": "Técnica estable, sin inercia y 1–2 repeticiones en reserva. Detén la serie si aparece dolor."
+        },
+        "rule": {
+          "incrementKg": 2.5,
+          "deloadAfterFailures": 3,
+          "deloadPercent": 10,
+          "repRange": {
+            "min": 8,
+            "max": 12
+          }
+        },
+        "result": {
+          "succeeded": false,
+          "deloaded": false,
+          "nextState": {
+            "nextLoadKg": 50,
+            "consecutiveFailures": 0,
+            "deloadCount": 0,
+            "lastEvaluatedSessionId": "qa-2"
+          }
+        }
+      },
+      "evidence": "Real generated intermediate leg-press: 3 x 10 vs rule max 12"
+    },
+    {
+      "id": "BUS-004",
+      "name": "Completing timed prescription must not count as repetition failure",
+      "status": "FAIL",
+      "expected": {
+        "failures": 0
+      },
+      "observed": {
+        "exerciseId": "front-plank",
+        "secondsPerSet": 30,
+        "result": {
+          "succeeded": false,
+          "deloaded": false,
+          "nextState": {
+            "nextLoadKg": 0,
+            "consecutiveFailures": 1,
+            "deloadCount": 0,
+            "lastEvaluatedSessionId": "qa-duration"
+          }
+        }
+      },
+      "evidence": "Generated front-plank completed 2 x 30 seconds"
+    },
+    {
+      "id": "BUS-005",
+      "name": "Selected priority muscles influence the generated routine",
+      "status": "FAIL",
+      "expected": {
+        "samePlan": false
+      },
+      "observed": {
+        "priorities": [
+          "chest",
+          "arms"
+        ],
+        "sessionMinutes": 60,
+        "samePlan": true
+      },
+      "evidence": "createDay appends priority IDs after 6 template exercises then slices to 6"
+    },
+    {
+      "id": "BUS-006",
+      "name": "Thirty-minute routine fits even minimum tempo/repetitions/rest time",
+      "status": "FAIL",
+      "expected": {
+        "eachDayMaxSeconds": 1800
+      },
+      "observed": {
+        "minimumSecondsByDay": [
+          2004,
+          2004,
+          2004
+        ],
+        "includesWarmupOrTransitions": false
+      },
+      "evidence": "Generated strength/intermediate/free-weights/30 min: explicit tempo and rests summed independently"
+    },
+    {
+      "id": "BUS-007",
+      "name": "Prefill preserves corresponding loads of previous working sets",
+      "status": "FAIL",
+      "expected": [
+        40,
+        50,
+        60
+      ],
+      "observed": [
+        40,
+        40,
+        40
+      ],
+      "evidence": "createWorkoutExercise with previous working set loads 40/50/60"
+    },
+    {
+      "id": "BUS-008",
+      "name": "Turning previous-load prefill off resets loads",
+      "status": "PASS",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "observed": [
+        0,
+        0,
+        0
+      ],
+      "evidence": "createWorkoutExercise(..., prefillPreviousLoad=false)"
+    },
+    {
+      "id": "BUS-009",
+      "name": "Per-side sets have distinct left/right identities",
+      "status": "PASS",
+      "expected": [
+        "1:left",
+        "1:right",
+        "2:left",
+        "2:right"
+      ],
+      "observed": [
+        "1:left",
+        "1:right",
+        "2:left",
+        "2:right"
+      ],
+      "evidence": "createWorkoutExercise(..., perSide=true)"
+    },
+    {
+      "id": "BUS-010",
+      "name": "Exact configured failure threshold triggers one 10% deload",
+      "status": "PASS",
+      "expected": {
+        "failures": [
+          1,
+          2,
+          0
+        ],
+        "loads": [
+          100,
+          100,
+          90
+        ],
+        "deloadCount": 1
+      },
+      "observed": {
+        "failures": [
+          1,
+          2,
+          0
+        ],
+        "loads": [
+          100,
+          100,
+          90
+        ],
+        "deloadCount": 1
+      },
+      "evidence": "evaluateProgression repeated failure sequence with explicit expected load"
+    },
+    {
+      "id": "BUS-011",
+      "name": "Completing the same workout is progression-idempotent",
+      "status": "PASS",
+      "expected": {
+        "unchanged": true
+      },
+      "observed": {
+        "unchanged": true,
+        "nextLoadKg": 92.5
+      },
+      "evidence": "ProgressionService.completeSession invoked twice on same synthetic session"
+    },
+    {
+      "id": "BUS-012",
+      "name": "1RM handles single rep and rejects fractional reps",
+      "status": "PASS",
+      "expected": {
+        "singleRep": 100,
+        "fractionalRejected": true
+      },
+      "observed": {
+        "singleRep": 100,
+        "fractionalRejected": true
+      },
+      "evidence": "estimateOneRepMax boundary independent of UI"
+    },
+    {
+      "id": "BUS-013",
+      "name": "Superset rests after the complete round",
+      "status": "FAIL",
+      "expected": {
+        "restAfterB1Seconds": 90
+      },
+      "observed": {
+        "afterA1Heading": "Curl alterno con mancuernas",
+        "rest90Visible": false,
+        "activeSetStatuses": [
+          {
+            "exerciseId": "dumbbell-curl",
+            "completed": 1
+          },
+          {
+            "exerciseId": "rope-triceps-pushdown",
+            "completed": 1
+          }
+        ]
+      },
+      "evidence": "Rendered WorkoutPage on synthetic 2-exercise superset; click A1 complete, Next, B1 complete"
+    },
+    {
+      "id": "BUS-014",
+      "name": "Extending rest updates the remote push deadline as well as local time",
+      "status": "FAIL",
+      "expected": {
+        "localRemaining": 90,
+        "remoteDueAfterSeconds": 90
+      },
+      "observed": {
+        "localRemaining": 90,
+        "remoteSchedules": [
+          60
+        ],
+        "remoteCancellations": 0
+      },
+      "evidence": "useRestTimer(true): start(60), add(30), push API mocked to inspect deadline requests"
+    },
+    {
+      "id": "BUS-015",
+      "name": "Negative load/fractional repetition cannot be marked complete",
+      "status": "FAIL",
+      "expected": {
+        "completionCallbacks": 0
+      },
+      "observed": {
+        "completionCallbacks": 1,
+        "saved": [
+          {
+            "setNumber": 1,
+            "loadKg": -10,
+            "repetitions": 1.5,
+            "durationSeconds": null,
+            "side": null,
+            "rpe": 8,
+            "rir": 2,
+            "completedAt": "2026-09-09T16:40:37.238Z"
+          }
+        ]
+      },
+      "evidence": "Rendered SetRow: change load=-10, repetitions=1.5, Complete"
+    },
+    {
+      "id": "BUS-016",
+      "name": "RPE outside 1..10 is rejected before autosave",
+      "status": "FAIL",
+      "expected": {
+        "invalidSaved": false,
+        "completionRejected": true
+      },
+      "observed": {
+        "invalidSaved": true,
+        "completionRejected": true
+      },
+      "evidence": "SetRow rpe=12 blur and complete; completion validates but blur calls save with 12"
+    },
+    {
+      "id": "BUS-017",
+      "name": "Female energy/BMI independent arithmetic reference",
+      "status": "PASS",
+      "expected": {
+        "bmi": 23.9,
+        "bmr": 1320,
+        "tdee": 1815
+      },
+      "observed": {
+        "bmi": 23.9,
+        "bmr": 1320,
+        "tdee": 1815
+      },
+      "evidence": "(10*65)+(6.25*165)-(5*40)-161=1320.25; factor 1.375"
+    },
+    {
+      "id": "BUS-018",
+      "name": "Accepted calculator inputs yield positive coherent calorie/macronutrient totals",
+      "status": "FAIL",
+      "expected": {
+        "positiveTarget": true,
+        "macroCaloriesWithinRounding": true
+      },
+      "observed": {
+        "targetCalories": 167,
+        "macros": {
+          "proteinGrams": 44,
+          "fatGrams": 5,
+          "carbohydrateGrams": 0,
+          "proteinPercent": 81,
+          "fatPercent": 19,
+          "carbohydratePercent": 0
+        },
+        "macroCalories": 221,
+        "difference": 54
+      },
+      "evidence": "calculateBodyMetrics accepted boundary female100y/100cm/20kg/sedentary/lose; arithmetic consistency only, no clinical judgement"
+    },
+    {
+      "id": "BUS-019",
+      "name": "Optional perimeters are all-or-valid, not partial estimates",
+      "status": "PASS",
+      "expected": {
+        "partialRejected": true,
+        "noPerimetersFat": null
+      },
+      "observed": {
+        "partialRejected": true,
+        "noPerimetersFat": null
+      },
+      "evidence": "calculateBodyMetrics null perimeters and only-neck cases"
+    },
+    {
+      "id": "BUS-020",
+      "name": "Metrics form prefills latest chronological body weight",
+      "status": "FAIL",
+      "expected": {
+        "weightKg": 75
+      },
+      "observed": {
+        "weightKg": 80
+      },
+      "evidence": "MetricsPage render: latest metric Aug1=80kg; newer dashboard weight Sep9=75kg"
+    },
+    {
+      "id": "BUS-027",
+      "name": "Acknowledgement of RPE save preserves a newer RIR edit in progress",
+      "status": "FAIL",
+      "expected": {
+        "rirBefore": "2",
+        "rirAfter": "2"
+      },
+      "observed": {
+        "rirBefore": "2",
+        "rirAfter": ""
+      },
+      "evidence": "ControlledParent delays onBlur RPE=8 prop acknowledgement; user types RIR=2; then prior save acknowledgement updates set prop; supports root UI-002"
+    },
+    {
+      "id": "BUS-021",
+      "name": "One-day reschedule removes only original occurrence and keeps base plan",
+      "status": "PASS",
+      "expected": {
+        "original": [],
+        "moved": [
+          "wednesday",
+          "monday"
+        ],
+        "nextMonday": [
+          "monday"
+        ],
+        "unchanged": true
+      },
+      "observed": {
+        "original": [],
+        "moved": [
+          "wednesday",
+          "monday"
+        ],
+        "nextMonday": [
+          "monday"
+        ],
+        "unchanged": true
+      },
+      "evidence": "effectivePlanDaysForDate original/moved/following-week dates"
+    },
+    {
+      "id": "BUS-022",
+      "name": "Constancy window is exactly 365 unique local days excluding future/old days",
+      "status": "PASS",
+      "expected": {
+        "length": 365,
+        "first": "2025-09-10",
+        "last": "2026-09-09",
+        "total": 2
+      },
+      "observed": {
+        "length": 365,
+        "first": "2025-09-10",
+        "last": "2026-09-09",
+        "total": 2
+      },
+      "evidence": "buildTrainingHeatmap controlled date, synthetic boundary sessions"
+    },
+    {
+      "id": "BUS-023",
+      "name": "Monthly reminder clamps month end and is due at exact deadline",
+      "status": "PASS",
+      "expected": {
+        "months": [
+          "2024-02-29T12:00:00.000Z",
+          "2025-02-28T12:00:00.000Z",
+          "2027-01-31T12:00:00.000Z"
+        ],
+        "due": true
+      },
+      "observed": {
+        "months": [
+          "2024-02-29T12:00:00.000Z",
+          "2025-02-28T12:00:00.000Z",
+          "2027-01-31T12:00:00.000Z"
+        ],
+        "due": true
+      },
+      "evidence": "addOneMonth leap/non-leap/year rollover and isMeasurementDue exact boundary"
+    },
+    {
+      "id": "BUS-024",
+      "name": "Muscle stimulus uses 2:1 primary/secondary weighting",
+      "status": "PASS",
+      "expected": {
+        "chest": 6,
+        "triceps": 3,
+        "sessionCount": 1
+      },
+      "observed": {
+        "chest": 6,
+        "triceps": 3,
+        "sessionCount": 1
+      },
+      "evidence": "calculateRecentMuscleScores synthetic 3 completed bench-press sets"
+    },
+    {
+      "id": "BUS-025",
+      "name": "Weight trend horizontal distance preserves elapsed calendar time",
+      "status": "FAIL",
+      "expected": {
+        "firstGapMuchSmallerThanSecond": true
+      },
+      "observed": {
+        "dates": [
+          "2026-01-01T12:00:00Z",
+          "2026-01-02T12:00:00Z",
+          "2026-09-09T12:00:00Z"
+        ],
+        "xs": [
+          48,
+          389,
+          730
+        ],
+        "gaps": [
+          341,
+          341
+        ]
+      },
+      "evidence": "Rendered WeightChart Jan1/Jan2/Sep9; measured svg point cx attributes"
+    },
+    {
+      "id": "BUS-026",
+      "name": "Bodyweight plan supports advertised optional pull-up bar",
+      "status": "FAIL",
+      "expected": {
+        "requiredBarExercises": []
+      },
+      "observed": {
+        "requiredBarExercises": [
+          "pull-up",
+          "chin-up",
+          "neutral-grip-pull-up"
+        ]
+      },
+      "evidence": "OnboardingWizard EquipmentStep says barra de dominadas opcional; actual generated bodyweight IDs inspected against catalog equipment"
+    }
+  ]
+}

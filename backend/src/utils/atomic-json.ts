@@ -26,12 +26,14 @@ export async function readJson<T>(filePath: string): Promise<T> {
 }
 
 export async function writeJsonAtomic(filePath: string, value: unknown): Promise<void> {
-  await mkdir(dirname(filePath), { recursive: true });
+  await mkdir(dirname(filePath), { recursive: true, mode: 0o700 });
   const temporaryPath = `${filePath}.${process.pid}.${randomUUID()}.tmp`;
   const serialized = `${JSON.stringify(value, null, 2)}\n`;
 
   try {
-    await writeFile(temporaryPath, serialized, { encoding: 'utf8', flag: 'wx' });
+    // Flush file contents before the atomic replacement. Restrict newly written
+    // account/state files to their owner on filesystems supporting POSIX modes.
+    await writeFile(temporaryPath, serialized, { encoding: 'utf8', flag: 'wx', mode: 0o600, flush: true });
     await rename(temporaryPath, filePath);
   } catch (error) {
     await rm(temporaryPath, { force: true });

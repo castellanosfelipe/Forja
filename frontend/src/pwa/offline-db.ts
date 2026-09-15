@@ -10,7 +10,15 @@ function openDatabase(): Promise<IDBDatabase> {
         request.result.createObjectStore(STORE_NAME);
       }
     };
-    request.onsuccess = () => resolve(request.result);
+    let abandoned = false;
+    request.onblocked = () => {
+      abandoned = true;
+      reject(new Error('Cierra las otras pestañas de FORJA y vuelve a intentarlo para actualizar tus datos guardados.'));
+    };
+    request.onsuccess = () => {
+      if (abandoned) request.result.close();
+      else resolve(request.result);
+    };
     request.onerror = () => reject(new Error('No pudimos abrir los datos guardados en este dispositivo.'));
   });
 }
@@ -20,34 +28,44 @@ export async function readOfflineValue<T>(key: string): Promise<T | null> {
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, 'readonly');
     const request = transaction.objectStore(STORE_NAME).get(key);
-    request.onsuccess = () => resolve((request.result as T | undefined) ?? null);
-    request.onerror = () => reject(new Error('No pudimos leer los datos guardados en este dispositivo.'));
-    transaction.oncomplete = () => database.close();
+    const fail = () => { database.close(); reject(new Error('No pudimos leer los datos guardados en este dispositivo.')); };
+    request.onerror = fail;
+    transaction.onerror = fail;
+    transaction.onabort = fail;
+    transaction.oncomplete = () => { database.close(); resolve((request.result as T | undefined) ?? null); };
   });
 }
 
-export async function writeOfflineValue<T>(key: string, value: T): Promise<void> {
+/** Commit related snapshots together: a draft must never outlive its matching base. */
+export async function changeOfflineValues(
+  entries: ReadonlyArray<readonly [string, unknown]>,
+  deletes: readonly string[] = [],
+): Promise<void> {
   const database = await openDatabase();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, 'readwrite');
-    transaction.objectStore(STORE_NAME).put(value, key);
+    const store = transaction.objectStore(STORE_NAME);
     transaction.oncomplete = () => {
       database.close();
       resolve();
     };
-    transaction.onerror = () => reject(new Error('No pudimos guardar tus cambios en este dispositivo.'));
+    const fail = () => { database.close(); reject(new Error('No pudimos guardar tus cambios en este dispositivo.')); };
+    transaction.onerror = fail;
+    transaction.onabort = fail;
+    try {
+      for (const [key, value] of entries) store.put(value, key);
+      for (const key of deletes) store.delete(key);
+    } catch {
+      transaction.abort();
+      fail();
+    }
   });
 }
 
-export async function deleteOfflineValue(key: string): Promise<void> {
-  const database = await openDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = database.transaction(STORE_NAME, 'readwrite');
-    transaction.objectStore(STORE_NAME).delete(key);
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onerror = () => reject(new Error('No pudimos retirar los datos guardados en este dispositivo.'));
-  });
+export function writeOfflineValue<T>(key: string, value: T): Promise<void> {
+  return changeOfflineValues([[key, value]]);
+}
+
+export function deleteOfflineValue(key: string): Promise<void> {
+  return changeOfflineValues([], [key]);
 }

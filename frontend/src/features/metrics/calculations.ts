@@ -115,6 +115,9 @@ function calculateMacros(weightKg: number, calories: number, goal: BodyGoal): Ma
   const proteinGrams = Math.round(weightKg * PROTEIN_GRAMS_PER_KG[goal]);
   const proteinCalories = proteinGrams * 4;
   const fatCalories = Math.round(calories * FAT_RATIO[goal]);
+  if (proteinCalories + fatCalories > calories) {
+    throw new Error('Revisa los datos y el objetivo: la energía calculada no permite distribuir los nutrientes de forma coherente.');
+  }
   const fatGrams = Math.round(fatCalories / 9);
   const carbohydrateCalories = Math.max(0, calories - proteinCalories - fatCalories);
   const carbohydrateGrams = Math.round(carbohydrateCalories / 4);

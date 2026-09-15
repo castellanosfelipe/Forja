@@ -3,6 +3,7 @@ import webPush, { type PushSubscription } from 'web-push';
 import type { AppConfig } from '../config/env.js';
 import type { BodyMeasurementReminder, PushSubscriptionRecord, RestTimerRecord, User, UserState } from '../domain/models.js';
 import { badRequest, notFound, serviceUnavailable } from '../http/errors.js';
+import { assertPublicPushDestination, publicPushAgent, validatePushSubscription } from '../utils/push-validation.js';
 import type { UserStateRepository } from '../repositories/user-state.repository.js';
 
 export class PushService {
@@ -26,18 +27,9 @@ export class PushService {
 
   public async subscribe(user: User, input: unknown): Promise<PushSubscriptionRecord> {
     this.publicKey();
-    const value = input as Partial<PushSubscription>;
-    if (
-      !value ||
-      typeof value !== 'object' ||
-      typeof value.endpoint !== 'string' ||
-      !value.endpoint.startsWith('https://') ||
-      !value.keys ||
-      typeof value.keys.p256dh !== 'string' ||
-      typeof value.keys.auth !== 'string'
-    ) {
-      throw badRequest('Invalid PushSubscription');
-    }
+    validatePushSubscription(input);
+    const value = input;
+    await assertPublicPushDestination(value.endpoint);
     const now = new Date().toISOString();
     let result!: PushSubscriptionRecord;
     await this.states.mutate(user, (state) => {
@@ -70,6 +62,15 @@ export class PushService {
       state.pushSubscriptions.splice(index, 1);
     });
     await this.syncMeasurementReminder(user);
+  }
+
+  public async detachDevice(user: User, endpoint: string): Promise<void> {
+    const state = await this.states.getOrCreate(user);
+    if (!state.pushSubscriptions.some((subscription) => subscription.endpoint === endpoint)) return;
+    const latest = await this.states.mutate(user, (draft) => {
+      draft.pushSubscriptions = draft.pushSubscriptions.filter((subscription) => subscription.endpoint !== endpoint);
+    });
+    this.armMeasurementReminder(user, latest);
   }
 
   public async scheduleRestTimer(
@@ -121,11 +122,13 @@ export class PushService {
   public async restore(users: User[]): Promise<void> {
     if (!this.enabled) return;
     for (const user of users) {
+      try {
       const state = await this.states.getOrCreate(user);
       for (const timer of state.restTimers.filter((candidate) => candidate.status === 'scheduled')) {
         this.arm(user, timer);
       }
       this.armMeasurementReminder(user, state);
+      } catch(error) { this.logTaskError(user, 'restore', error); }
     }
   }
 
@@ -133,6 +136,14 @@ export class PushService {
     const state = await this.states.getOrCreate(user);
     this.armMeasurementReminder(user, state);
     return structuredClone(state.bodyMeasurementReminder);
+  }
+
+  public reconcile(user: User, state: UserState): void {
+    this.armMeasurementReminder(user, state);
+  }
+
+  private logTaskError(user: User, task: string, error: unknown): void {
+    console.error(JSON.stringify({level:'error',event:'push_task_failed',userId:user.id,task,message:error instanceof Error?error.message:'unknown error'}));
   }
 
   public shutdown(): void {
@@ -150,7 +161,7 @@ export class PushService {
       if (Date.parse(timer.dueAt) > Date.now() + 1_000) {
         this.arm(user, timer);
       } else {
-        void this.deliver(user, timer.id);
+        void this.deliver(user, timer.id).catch(error=>this.logTaskError(user, timer.id, error));
       }
     }, delay));
   }
@@ -161,14 +172,14 @@ export class PushService {
     if (existing) clearTimeout(existing);
     this.handles.delete(key);
     const reminder = state.bodyMeasurementReminder;
-    if (!reminder.enabled || state.pushSubscriptions.length === 0) return;
+    if (!this.enabled || !reminder.enabled || state.pushSubscriptions.length === 0) return;
     const delay = Math.max(0, Math.min(Date.parse(reminder.nextDueAt) - Date.now(), 2_147_000_000));
     this.handles.set(key, setTimeout(() => {
       this.handles.delete(key);
       if (Date.parse(reminder.nextDueAt) > Date.now() + 1_000) {
-        void this.syncMeasurementReminder(user);
+        void this.syncMeasurementReminder(user).catch(error=>this.logTaskError(user,'measurement-reschedule',error));
       } else {
-        void this.deliverMeasurementReminder(user);
+        void this.deliverMeasurementReminder(user).catch(error=>this.logTaskError(user,'measurement-delivery',error));
       }
     }, delay));
   }
@@ -188,9 +199,13 @@ export class PushService {
     });
     await Promise.all(state.pushSubscriptions.map(async (subscription) => {
       try {
+        validatePushSubscription(subscription);
+        await assertPublicPushDestination(subscription.endpoint);
         await webPush.sendNotification(this.toWebPushSubscription(subscription), payload, {
           TTL: 60 * 10,
           urgency: 'high',
+          agent: publicPushAgent,
+          timeout: 10_000,
         });
         successful += 1;
       } catch (error) {
@@ -213,7 +228,8 @@ export class PushService {
   private async deliverMeasurementReminder(user: User): Promise<void> {
     const state = await this.states.getOrCreate(user);
     const reminder = state.bodyMeasurementReminder;
-    if (!reminder.enabled || Date.parse(reminder.nextDueAt) > Date.now() || state.pushSubscriptions.length === 0) return;
+    if (!reminder.enabled || state.pushSubscriptions.length === 0) return;
+    if(Date.parse(reminder.nextDueAt)>Date.now()){this.armMeasurementReminder(user,state);return;}
     const expiredIds: string[] = [];
     let successful = 0;
     const payload = JSON.stringify({
@@ -224,9 +240,13 @@ export class PushService {
     });
     await Promise.all(state.pushSubscriptions.map(async (subscription) => {
       try {
+        validatePushSubscription(subscription);
+        await assertPublicPushDestination(subscription.endpoint);
         await webPush.sendNotification(this.toWebPushSubscription(subscription), payload, {
           TTL: 60 * 60 * 24 * 7,
           urgency: 'normal',
+          agent: publicPushAgent,
+          timeout: 10_000,
         });
         successful += 1;
       } catch (error) {
@@ -238,6 +258,9 @@ export class PushService {
       latest.pushSubscriptions = latest.pushSubscriptions.filter(
         (subscription) => !expiredIds.includes(subscription.id),
       );
+      // A measurement or snooze saved while delivery was in flight wins over
+      // the schedule snapshot used for this notification.
+      if (!latest.bodyMeasurementReminder.enabled || latest.bodyMeasurementReminder.nextDueAt !== reminder.nextDueAt) return;
       if (successful > 0) {
         latest.bodyMeasurementReminder.lastNotifiedAt = new Date().toISOString();
         latest.bodyMeasurementReminder.nextDueAt = addOneMonth(new Date());

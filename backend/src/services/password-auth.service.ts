@@ -27,6 +27,7 @@ interface LoginAttempt {
   failures: number;
   windowStartedAt: number;
   blockedUntil: number;
+  inFlight: number;
 }
 
 export class PasswordAuthService {
@@ -60,35 +61,49 @@ export class PasswordAuthService {
     const username = normalizeUsername(stringField(body, 'username', { min: 3, max: 64 })!);
     const password = passwordField(body, 'password', { min: 1 });
     const attemptKey = `${clientKey}:${username.toLocaleLowerCase('en-US')}`;
-    this.assertNotBlocked(attemptKey);
-
+    this.reserveAttempt(attemptKey);
+    let success = false;
+    try {
     const user = await this.database.findUserByUsername(username);
     const credential = user?.passwordCredential ?? DUMMY_CREDENTIAL;
     const verified = await verifyPassword(password, credential);
     if (!user || !user.passwordCredential || !verified) {
-      this.recordFailure(attemptKey);
       throw unauthorized('Usuario o contraseña incorrectos');
     }
 
-    this.attempts.delete(attemptKey);
+    success = true;
     return user;
+    } finally {
+      const attempt = this.attempts.get(attemptKey)!;
+      attempt.inFlight -= 1;
+      if (success) { attempt.failures = 0; attempt.blockedUntil = 0; }
+      else this.recordFailure(attemptKey);
+      if (success && attempt.inFlight === 0) this.attempts.delete(attemptKey);
+    }
   }
 
-  private assertNotBlocked(key: string): void {
+  private reserveAttempt(key: string): void {
     const now = Date.now();
-    const attempt = this.attempts.get(key);
-    if (!attempt) return;
-    if (attempt.blockedUntil > now) {
+    for (const [candidate, entry] of this.attempts) {
+      if (!entry.inFlight && entry.blockedUntil <= now && now - entry.windowStartedAt >= ATTEMPT_WINDOW_MS) this.attempts.delete(candidate);
+    }
+    let attempt = this.attempts.get(key);
+    if (!attempt) {
+      if (this.attempts.size >= 10_000) throw tooManyRequests('Demasiados intentos. Vuelve a intentarlo más tarde');
+      attempt = { failures: 0, windowStartedAt: now, blockedUntil: 0, inFlight: 0 };
+      this.attempts.set(key, attempt);
+    }
+    if (attempt.blockedUntil > now || attempt.failures + attempt.inFlight >= MAX_FAILURES) {
       throw tooManyRequests('Demasiados intentos. Espera 15 minutos antes de volver a probar');
     }
-    if (now - attempt.windowStartedAt >= ATTEMPT_WINDOW_MS) this.attempts.delete(key);
+    attempt.inFlight += 1;
   }
 
   private recordFailure(key: string): void {
     const now = Date.now();
     const current = this.attempts.get(key);
     const attempt = !current || now - current.windowStartedAt >= ATTEMPT_WINDOW_MS
-      ? { failures: 0, windowStartedAt: now, blockedUntil: 0 }
+      ? { failures: 0, windowStartedAt: now, blockedUntil: 0, inFlight: current?.inFlight ?? 0 }
       : current;
     attempt.failures += 1;
     if (attempt.failures >= MAX_FAILURES) attempt.blockedUntil = now + BLOCK_MS;

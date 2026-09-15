@@ -3,6 +3,7 @@ import { FormEvent, useState } from 'react';
 import { authApi } from '../../api/auth.api';
 import type { AuthUser } from '../../types/auth';
 import { userFacingError } from '../../utils/user-facing-error';
+import { useAuthStore } from '../../stores/auth.store';
 
 interface AuthScreenProps {
   onAuthenticated(user: AuthUser): void;
@@ -12,6 +13,7 @@ type AuthMode = 'login' | 'register';
 type AuthMethod = 'password' | 'passkey';
 
 export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
+  const notice = useAuthStore((store) => store.notice);
   const [mode, setMode] = useState<AuthMode>('login');
   const [method, setMethod] = useState<AuthMethod>('password');
   const [username, setUsername] = useState('');
@@ -30,6 +32,7 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
     }
     setBusy(true);
     try {
+      await useAuthStore.getState().prepareSignIn();
       const user = method === 'password'
         ? mode === 'register'
           ? await authApi.registerWithPassword(username, password)
@@ -85,6 +88,7 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
           <p className="step-label">{isRegistration ? 'Primera vez en FORJA' : 'Bienvenido de nuevo'}</p>
           <h2 id="auth-title">{isRegistration ? 'Crea tu cuenta' : 'Abre tu gimnasio'}</h2>
           <p className="muted">Elige cómo quieres proteger y abrir tu cuenta.</p>
+          {notice && <div className="notice-banner" role="status">{notice}<button className="text-button" type="button" onClick={() => void useAuthStore.getState().initialize()}>Volver a intentar</button></div>}
 
           <div className="auth-method-tabs" aria-label="Método de acceso">
             <button type="button" className={isPassword ? 'active' : ''} aria-pressed={isPassword} onClick={() => changeMethod('password')}><KeyRound size={18} /> Usuario y contraseña</button>

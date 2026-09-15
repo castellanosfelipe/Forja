@@ -1,0 +1,170 @@
+[
+  {
+    "h1": "Hola, qa_visual_20260909.",
+    "pass": true,
+    "route": "/",
+    "viewport": 360,
+    "width": 345
+  },
+  {
+    "h1": "Tu cuerpo en contexto.",
+    "pass": true,
+    "route": "/metrics",
+    "viewport": 360,
+    "width": 345
+  },
+  {
+    "h1": "Forja de masa muscular · 3 días",
+    "pass": true,
+    "route": "/plan",
+    "viewport": 360,
+    "width": 345
+  },
+  {
+    "h1": "Biblioteca",
+    "pass": true,
+    "route": "/library",
+    "viewport": 360,
+    "width": 345
+  },
+  {
+    "h1": "¿Qué toca hoy?",
+    "pass": true,
+    "route": "/workout",
+    "viewport": 360,
+    "width": 345
+  },
+  {
+    "h1": "Tu espacio",
+    "pass": true,
+    "route": "/profile",
+    "viewport": 360,
+    "width": 345
+  },
+  {
+    "h1": "Hola, qa_visual_20260909.",
+    "pass": true,
+    "route": "/",
+    "viewport": 390,
+    "width": 375
+  },
+  {
+    "h1": "Tu cuerpo en contexto.",
+    "pass": true,
+    "route": "/metrics",
+    "viewport": 390,
+    "width": 375
+  },
+  {
+    "h1": "Forja de masa muscular · 3 días",
+    "pass": true,
+    "route": "/plan",
+    "viewport": 390,
+    "width": 375
+  },
+  {
+    "h1": "Biblioteca",
+    "pass": true,
+    "route": "/library",
+    "viewport": 390,
+    "width": 375
+  },
+  {
+    "h1": "¿Qué toca hoy?",
+    "pass": true,
+    "route": "/workout",
+    "viewport": 390,
+    "width": 375
+  },
+  {
+    "h1": "Tu espacio",
+    "pass": true,
+    "route": "/profile",
+    "viewport": 390,
+    "width": 375
+  },
+  {
+    "h1": "Hola, qa_visual_20260909.",
+    "pass": true,
+    "route": "/",
+    "viewport": 768,
+    "width": 753
+  },
+  {
+    "h1": "Tu cuerpo en contexto.",
+    "pass": true,
+    "route": "/metrics",
+    "viewport": 768,
+    "width": 753
+  },
+  {
+    "h1": "Forja de masa muscular · 3 días",
+    "pass": true,
+    "route": "/plan",
+    "viewport": 768,
+    "width": 753
+  },
+  {
+    "h1": "Biblioteca",
+    "pass": true,
+    "route": "/library",
+    "viewport": 768,
+    "width": 753
+  },
+  {
+    "h1": "¿Qué toca hoy?",
+    "pass": true,
+    "route": "/workout",
+    "viewport": 768,
+    "width": 753
+  },
+  {
+    "h1": "Tu espacio",
+    "pass": true,
+    "route": "/profile",
+    "viewport": 768,
+    "width": 753
+  },
+  {
+    "h1": "Hola, qa_visual_20260909.",
+    "pass": true,
+    "route": "/",
+    "viewport": 1440,
+    "width": 1425
+  },
+  {
+    "h1": "Tu cuerpo en contexto.",
+    "pass": true,
+    "route": "/metrics",
+    "viewport": 1440,
+    "width": 1425
+  },
+  {
+    "h1": "Forja de masa muscular · 3 días",
+    "pass": true,
+    "route": "/plan",
+    "viewport": 1440,
+    "width": 1425
+  },
+  {
+    "h1": "Biblioteca",
+    "pass": true,
+    "route": "/library",
+    "viewport": 1440,
+    "width": 1425
+  },
+  {
+    "h1": "¿Qué toca hoy?",
+    "pass": true,
+    "route": "/workout",
+    "viewport": 1440,
+    "width": 1440
+  },
+  {
+    "h1": "Tu espacio",
+    "pass": true,
+    "route": "/profile",
+    "viewport": 1440,
+    "width": 1425
+  }
+]

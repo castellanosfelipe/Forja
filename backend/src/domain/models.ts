@@ -40,6 +40,8 @@ export interface User {
 export interface Database {
   schemaVersion: 1;
   users: User[];
+  sessions?: { id: string; userId: string; expiresAt: number }[];
+  authFlows?: { id: string; expiresAt: number }[];
 }
 
 export interface BodyWeightEntry {
@@ -109,6 +111,7 @@ export interface Exercise {
     primary: string[];
     secondary: string[];
   };
+  guideMedia?: { kind: 'image'; dataUrl: string; alt: string };
 }
 
 export interface WorkoutSet {
@@ -127,6 +130,16 @@ export interface WorkoutExercise {
   sets: WorkoutSet[];
   estimatedOneRepMaxKg: number | null;
   notes: string | null;
+  prescription?: {
+    sets: number;
+    repetitions?: { min: number; max: number };
+    durationSeconds?: number;
+    restSeconds: number;
+    targetRpe?: number;
+    tempo?: { eccentricSeconds: number; pauseSeconds: number; concentricSeconds: number };
+    coachingNote?: string;
+  };
+  block?: { id: string; type: 'standard' | 'superset'; rounds?: number; restAfterRoundSeconds?: number };
 }
 
 export interface WorkoutSession {
@@ -245,6 +258,7 @@ export interface UserState {
 export interface SessionClaims {
   kind: 'session';
   sub: string;
+  sid: string;
   iat: number;
   exp: number;
 }

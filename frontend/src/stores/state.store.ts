@@ -1,25 +1,34 @@
 import { create } from 'zustand';
 import { ApiError } from '../api/client';
 import { stateApi } from '../api/state.api';
-import { deleteOfflineValue, readOfflineValue, writeOfflineValue } from '../pwa/offline-db';
+import { changeOfflineValues, readOfflineValue } from '../pwa/offline-db';
 import type { SyncStatus, UserState } from '../types/state';
 import { userFacingError } from '../utils/user-facing-error';
 import { useAuthStore } from './auth.store';
 
-function offlineKeys() {
-  const userId = useAuthStore.getState().user?.id ?? 'anonymous';
-  return {
-    base: `server-state:${userId}`,
-    cache: `cached-state:${userId}`,
-    pending: `pending-state:${userId}`,
-  };
-}
-
+let generation = 0;
 let operationQueue: Promise<void> = Promise.resolve();
+let persistenceQueue: Promise<void> = Promise.resolve();
 
-function serialize(operation: () => Promise<void>): Promise<void> {
-  const result = operationQueue.catch(() => undefined).then(operation);
+function context() {
+  const userId = useAuthStore.getState().user?.id ?? null;
+  return { userId, generation, base: `server-state:${userId}`, cache: `cached-state:${userId}`, pending: `pending-state:${userId}` };
+}
+type Context = ReturnType<typeof context>;
+function current(ctx: Context): boolean {
+  return ctx.userId !== null && ctx.generation === generation && useAuthStore.getState().user?.id === ctx.userId;
+}
+function owned(value: UserState | null, ctx: Context): UserState | null {
+  return value?.owner?.userId === ctx.userId ? value : null;
+}
+function serialize(ctx: Context, operation: () => Promise<void>): Promise<void> {
+  const result = operationQueue.catch(() => undefined).then(async () => { if (current(ctx)) await operation(); });
   operationQueue = result.catch(() => undefined);
+  return result;
+}
+function persist(ctx: Context, operation: () => Promise<unknown>): Promise<void> {
+  const result = persistenceQueue.catch(() => undefined).then(async () => { if (current(ctx)) await operation(); });
+  persistenceQueue = result.catch(() => undefined);
   return result;
 }
 
@@ -33,190 +42,179 @@ interface StateStore {
   update(mutator: (state: UserState) => void): Promise<void>;
   flush(): Promise<void>;
   clearError(): void;
-  reset(): void;
+  reset(): Promise<void>;
 }
+type StoreSetter = (partial: Partial<StateStore>) => void;
+type StoreGetter = () => StateStore;
+const empty = { state: null, status: 'idle' as const, error: null, hasPendingChanges: false };
 
 export const useStateStore = create<StateStore>((set, get) => ({
-  state: null,
-  status: 'idle',
-  error: null,
-  hasPendingChanges: false,
-
-  async load() {
-    return serialize(async () => {
-    set({ status: 'loading', error: null });
-    const keys = offlineKeys();
-    const cached = await readOfflineValue<UserState>(keys.cache).catch(() => null);
-    if (cached) set({ state: cached });
-    try {
-      const remote = await stateApi.get();
-      await Promise.all([
-        writeOfflineValue(keys.base, remote),
-        writeOfflineValue(keys.cache, remote),
-      ]);
-      const pending = await readOfflineValue<UserState>(keys.pending);
+  ...empty,
+  load() {
+    const ctx = context();
+    return serialize(ctx, async () => {
+      set({ status: 'loading', error: null });
+      let cached: UserState | null;
+      let storedPending: UserState | null;
+      try {
+        [cached, storedPending] = await Promise.all([
+          readOfflineValue<UserState>(ctx.cache),
+          readOfflineValue<UserState>(ctx.pending),
+        ]);
+      } catch {
+        if (current(ctx)) set({ status: 'error', error: 'No pudimos leer tus datos guardados en este dispositivo. Cierra otras pestañas de FORJA y vuelve a intentarlo. No se ha reemplazado ninguna copia.' });
+        return;
+      }
+      if (!current(ctx)) return;
+      const pending = (get().hasPendingChanges ? owned(get().state, ctx) : null) ?? owned(storedPending, ctx);
+      const local = pending ?? owned(cached, ctx);
+      if (local) set({ state: local, hasPendingChanges: Boolean(pending) });
+      let remote: UserState;
+      try { remote = await stateApi.get(); }
+      catch (cause) {
+        if (!current(ctx)) return;
+        set({
+          status: local ? 'offline' : 'error',
+          hasPendingChanges: Boolean(pending),
+          error: local ? 'No tienes conexión. Puedes seguir usando FORJA y guardaremos tus cambios cuando vuelvas.' : errorMessage(cause),
+        });
+        return;
+      }
+      if (!current(ctx)) return;
       if (pending) {
+        // Preserve the base belonging to the pending draft until reconciliation succeeds.
         set({ state: pending, status: 'offline', hasPendingChanges: true });
-        await flushPending(keys, set, get);
+        await flushPending(ctx, set, get);
       } else {
-        set({ state: remote, status: 'idle', hasPendingChanges: false });
+        set({ state: remote, status: 'idle', error: null, hasPendingChanges: false });
+        try { await persist(ctx, () => changeOfflineValues([[ctx.base, remote], [ctx.cache, remote]])); }
+        catch { if (current(ctx)) set({ status: 'error', error: 'Tus datos están en tu cuenta, pero no pudimos guardar una copia en este dispositivo. Revisa el espacio disponible.' }); }
       }
-    } catch (cause) {
-      if (cached) {
-        set({ status: 'offline', error: 'No tienes conexión. Puedes seguir usando FORJA y guardaremos tus cambios cuando vuelvas.' });
-      } else {
-        set({ status: 'error', error: errorMessage(cause) });
-      }
-    }
     });
   },
-
-  async refresh(options = {}) {
-    return serialize(async () => {
-    const keys = offlineKeys();
-    const pending = await readOfflineValue<UserState>(keys.pending).catch(() => null);
-    if (!options.discardPending && (get().hasPendingChanges || pending)) {
-      throw new Error('Aún hay cambios por guardar en tu cuenta. Espera a que terminen o guarda una copia antes de continuar.');
-    }
-    const remote = await stateApi.get();
-    await Promise.all([
-      writeOfflineValue(keys.base, remote),
-      writeOfflineValue(keys.cache, remote),
-      deleteOfflineValue(keys.pending),
-    ]);
-    set({ state: remote, status: 'idle', error: null, hasPendingChanges: false });
+  refresh(options = {}) {
+    const ctx = context();
+    return serialize(ctx, async () => {
+      const pending = await readOfflineValue<UserState>(ctx.pending);
+      if (!current(ctx)) return;
+      if (!options.discardPending && (get().hasPendingChanges || pending)) {
+        throw new Error('Aún hay cambios por guardar en tu cuenta. Espera a que terminen o guarda una copia antes de continuar.');
+      }
+      const remote = await stateApi.get();
+      if (!current(ctx)) return;
+      await acceptSavedState(ctx, remote, set);
     });
   },
-
-  async update(mutator) {
-    return serialize(async () => {
-      const keys = offlineKeys();
-      const current = get().state;
-      if (!current) return;
-      const draft = structuredClone(current);
+  update(mutator) {
+    const ctx = context();
+    return serialize(ctx, async () => {
+      const previous = owned(get().state, ctx);
+      if (!previous) return;
+      const draft = structuredClone(previous);
       mutator(draft);
       draft.owner.updatedAt = new Date().toISOString();
-
-      // Update memory before the asynchronous IndexedDB writes. Subsequent queued
-      // mutations will always clone this latest snapshot instead of an older one.
-      set({
-        state: draft,
-        error: null,
-        hasPendingChanges: true,
-        status: navigator.onLine ? 'syncing' : 'offline',
-      });
-      await Promise.all([
-        writeOfflineValue(keys.cache, draft),
-        writeOfflineValue(keys.pending, draft),
-      ]);
-      if (navigator.onLine) await flushPending(keys, set, get);
+      set({ state: draft, error: null, hasPendingChanges: true, status: navigator.onLine ? 'syncing' : 'offline' });
+      try {
+        await persist(ctx, () => changeOfflineValues([[ctx.cache, draft], [ctx.pending, draft]]));
+      } catch {
+        if (current(ctx)) setStorageFailure(set);
+        return;
+      }
+      if (current(ctx) && navigator.onLine) await flushPending(ctx, set, get);
     });
   },
-
-  async flush() {
-    return serialize(() => flushPending(offlineKeys(), set, get));
+  flush() {
+    const ctx = context();
+    return serialize(ctx, () => flushPending(ctx, set, get));
   },
-
   clearError() { set({ error: null }); },
   reset() {
-    const keys = offlineKeys();
-    void Promise.all([
-      deleteOfflineValue(keys.base),
-      deleteOfflineValue(keys.cache),
-      deleteOfflineValue(keys.pending),
-    ]);
-    set({ state: null, status: 'idle', error: null, hasPendingChanges: false });
+    const ctx = context();
+    generation += 1;
+    operationQueue = Promise.resolve();
+    set(empty);
+    // Queue deletion behind writes already underway. Stale operations cannot enqueue new writes.
+    const cleanup = persistenceQueue.catch(() => undefined).then(async () => {
+      if (!ctx.userId) return;
+      await changeOfflineValues([], [ctx.base, ctx.cache, ctx.pending]);
+    });
+    persistenceQueue = cleanup.catch(() => undefined);
+    return cleanup;
   },
 }));
 
-type StoreSetter = (partial: Partial<StateStore>) => void;
-type StoreGetter = () => StateStore;
-type OfflineKeys = ReturnType<typeof offlineKeys>;
+// Changing accounts clears visible state immediately but preserves an expired session's pending draft.
+useAuthStore.subscribe((next, previous) => {
+  if (next.user?.id === previous.user?.id) return;
+  generation += 1;
+  operationQueue = Promise.resolve();
+  useStateStore.setState(empty);
+});
 
-async function flushPending(keys: OfflineKeys, set: StoreSetter, get: StoreGetter): Promise<void> {
-  let pending = await readOfflineValue<UserState>(keys.pending);
-  if (!pending || !navigator.onLine) return;
-
-  set({ status: 'syncing', error: null });
+async function flushPending(ctx: Context, set: StoreSetter, get: StoreGetter): Promise<void> {
+  if (!current(ctx) || !navigator.onLine) return;
+  let pending = get().hasPendingChanges ? owned(get().state, ctx) : null;
+  try { pending ??= owned(await readOfflineValue<UserState>(ctx.pending), ctx); }
+  catch { if (current(ctx)) setStorageFailure(set); return; }
+  if (!pending || !current(ctx)) return;
+  set({ status: 'syncing', error: null, hasPendingChanges: true });
+  try {
+    // Also retries drafts that could previously be stored only in memory.
+    await persist(ctx, () => changeOfflineValues([[ctx.cache, pending], [ctx.pending, pending]]));
+  } catch { if (current(ctx)) setStorageFailure(set); return; }
+  if (!current(ctx)) return;
   try {
     const saved = await stateApi.replace(pending);
-    await acceptSavedState(keys, saved, set);
+    if (current(ctx)) await acceptSavedState(ctx, saved, set);
     return;
   } catch (cause) {
-    if (!(cause instanceof ApiError) || cause.status !== 409) {
-      setSyncFailure(cause, set);
-      return;
-    }
+    if (!current(ctx)) return;
+    if (!(cause instanceof ApiError) || cause.status !== 409) { setSyncFailure(cause, set); return; }
   }
-
   try {
-    const [remote, base] = await Promise.all([
-      stateApi.get(),
-      readOfflineValue<UserState>(keys.base).catch(() => null),
-    ]);
-    const rebased = rebasePendingState(base, pending, remote);
+    const [remote, base] = await Promise.all([stateApi.get(), readOfflineValue<UserState>(ctx.base).catch(() => null)]);
+    if (!current(ctx)) return;
+    const rebased = rebasePendingState(owned(base, ctx), pending, remote);
     if (!rebased) {
-      set({
-        status: 'conflict',
-        error: 'Tus cambios y los de otro dispositivo no coinciden. Nada se ha borrado: guarda una copia o elige qué información conservar.',
-        hasPendingChanges: true,
-      });
+      set({ status: 'conflict', error: 'Tus cambios y los de otro dispositivo no coinciden. Nada se ha borrado: guarda una copia o elige qué información conservar.', hasPendingChanges: true });
       return;
     }
-
     pending = rebased;
-    await Promise.all([
-      writeOfflineValue(keys.base, remote),
-      writeOfflineValue(keys.cache, pending),
-      writeOfflineValue(keys.pending, pending),
-    ]);
+    try { await persist(ctx, () => changeOfflineValues([[ctx.base, remote], [ctx.cache, pending], [ctx.pending, pending]])); }
+    catch { if (current(ctx)) setStorageFailure(set); return; }
+    if (!current(ctx)) return;
     set({ state: pending, status: 'syncing', hasPendingChanges: true });
     const saved = await stateApi.replace(pending);
-    await acceptSavedState(keys, saved, set);
+    if (current(ctx)) await acceptSavedState(ctx, saved, set);
   } catch (cause) {
+    if (!current(ctx)) return;
     if (cause instanceof ApiError && cause.status === 409) {
-      set({
-        status: 'conflict',
-        error: 'Tu información cambió otra vez en otro dispositivo. Tus cambios siguen a salvo aquí.',
-        hasPendingChanges: true,
-      });
-      return;
-    }
-    setSyncFailure(cause, set);
+      set({ status: 'conflict', error: 'Tu información cambió otra vez en otro dispositivo. Tus cambios siguen a salvo aquí.', hasPendingChanges: true });
+    } else setSyncFailure(cause, set);
   }
 }
-
-async function acceptSavedState(keys: OfflineKeys, saved: UserState, set: StoreSetter): Promise<void> {
-  await Promise.all([
-    writeOfflineValue(keys.base, saved),
-    writeOfflineValue(keys.cache, saved),
-    deleteOfflineValue(keys.pending),
-  ]);
-  set({ state: saved, status: 'idle', error: null, hasPendingChanges: false });
+async function acceptSavedState(ctx: Context, saved: UserState, set: StoreSetter): Promise<void> {
+  try { await persist(ctx, () => changeOfflineValues([[ctx.base, saved], [ctx.cache, saved]], [ctx.pending])); }
+  catch { if (current(ctx)) setStorageFailure(set); return; }
+  if (current(ctx)) set({ state: saved, status: 'idle', error: null, hasPendingChanges: false });
 }
-
+function setStorageFailure(set: StoreSetter): void {
+  set({ status: 'error', error: 'No pudimos guardar tus cambios en este dispositivo. Siguen abiertos aquí: guarda una copia antes de cerrar o recargar y libera espacio para volver a intentarlo.', hasPendingChanges: true });
+}
 function setSyncFailure(cause: unknown, set: StoreSetter): void {
   if (cause instanceof ApiError && cause.status === 401) {
-    set({
-      status: 'error',
-      error: 'Por seguridad, vuelve a iniciar sesión. Tus cambios siguen a salvo en este dispositivo y se guardarán en tu cuenta cuando entres.',
-      hasPendingChanges: true,
-    });
+    set({ status: 'error', error: 'Por seguridad, vuelve a iniciar sesión. Tus cambios siguen a salvo en este dispositivo y se guardarán en tu cuenta cuando entres.', hasPendingChanges: true });
     return;
   }
   if (cause instanceof ApiError && cause.status === 413) {
-    set({
-      status: 'error',
-      error: 'Has alcanzado el límite de información que puede guardarse en tu cuenta. Tus cambios siguen a salvo aquí; guarda una copia antes de continuar.',
-      hasPendingChanges: true,
-    });
+    set({ status: 'error', error: 'Has alcanzado el límite de información que puede guardarse en tu cuenta. Tus cambios siguen a salvo aquí; guarda una copia antes de continuar.', hasPendingChanges: true });
     return;
   }
-  set({
-    status: 'offline',
-    error: 'Sin conexión. Tus cambios siguen a salvo y se guardarán cuando vuelvas a conectarte.',
-    hasPendingChanges: true,
-  });
+  if (cause instanceof ApiError && cause.status >= 400 && cause.status < 500) {
+    set({ status: 'error', error: 'No pudimos guardar estos cambios. Guarda una copia y revisa los datos antes de volver a intentarlo.', hasPendingChanges: true });
+    return;
+  }
+  set({ status: 'offline', error: 'Sin conexión. Tus cambios siguen a salvo y se guardarán cuando vuelvas a conectarte.', hasPendingChanges: true });
 }
 
 /**

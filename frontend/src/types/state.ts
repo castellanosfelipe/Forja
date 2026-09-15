@@ -88,6 +88,7 @@ export interface Exercise {
   measurement: 'repetitions' | 'duration';
   isBodyweight: boolean;
   isPerSide: boolean;
+  guideMedia?: { kind: 'image'; dataUrl: string; alt: string };
   muscles: {
     primary: string[];
     secondary: string[];
@@ -153,6 +154,8 @@ export interface WorkoutSet {
 
 export interface WorkoutExercise {
   exerciseId: string;
+  prescription?: Omit<ExercisePrescription, 'exerciseId'>;
+  block?: Pick<PlanBlock, 'id' | 'type' | 'rounds' | 'restAfterRoundSeconds'>;
   sets: WorkoutSet[];
   estimatedOneRepMaxKg: number | null;
   notes: string | null;

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { notFound } from './errors.js';
+import { badRequest, notFound } from './errors.js';
 
 export interface RouteContext {
   request: IncomingMessage;
@@ -46,7 +46,8 @@ export class Router {
       if (!match) continue;
       const params: Record<string, string> = {};
       route.parameterNames.forEach((name, index) => {
-        params[name] = decodeURIComponent(match[index + 1]!);
+        try { params[name] = decodeURIComponent(match[index + 1]!); }
+        catch { throw badRequest('Invalid URL encoding'); }
       });
       await route.handler({ request, response, url, params });
       return;

@@ -15,6 +15,7 @@ import { badRequest, conflict, notFound } from '../errors.js';
 import { readJsonBody } from '../request.js';
 import { json } from '../response.js';
 import type { Router } from '../router.js';
+import { validateWorkoutExercises } from '../../utils/state-validation.js';
 
 export function registerWorkoutRoutes(
   router: Router,
@@ -112,7 +113,7 @@ function parseNewWorkout(body: Record<string, unknown>): WorkoutSession {
 
 function parseExercises(value: unknown): WorkoutExercise[] {
   if (!Array.isArray(value) || value.length > 100) throw badRequest('exercises must be an array of at most 100 items');
-  return value.map((candidate, index) => {
+  const parsed = value.map((candidate, index) => {
     const exercise = objectBody(candidate);
     const setsValue = exercise.sets;
     if (!Array.isArray(setsValue) || setsValue.length > 100) {
@@ -123,8 +124,12 @@ function parseExercises(value: unknown): WorkoutExercise[] {
       sets: setsValue.map((set, setIndex) => parseSet(set, setIndex)),
       estimatedOneRepMaxKg: null,
       notes: nullableStringField(exercise, 'notes', 1_000),
+      ...(exercise.prescription === undefined ? {} : { prescription: structuredClone(exercise.prescription) as WorkoutExercise['prescription'] }),
+      ...(exercise.block === undefined ? {} : { block: structuredClone(exercise.block) as WorkoutExercise['block'] }),
     };
   });
+  validateWorkoutExercises(parsed, 'exercises');
+  return parsed as WorkoutExercise[];
 }
 
 function parseSet(value: unknown, index: number): WorkoutSet {

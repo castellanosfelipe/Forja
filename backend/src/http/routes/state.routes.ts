@@ -7,11 +7,13 @@ import { readJsonBody, parseIfMatch } from '../request.js';
 import { json, noContent, stateJson } from '../response.js';
 import type { Router } from '../router.js';
 import { notFound } from '../errors.js';
+import type { PushService } from '../../services/push.service.js';
 
 export function registerStateRoutes(
   router: Router,
   sessions: SessionService,
   states: UserStateRepository,
+  push: PushService,
 ): void {
   router.add('GET', '/api/state', async ({ request, response }) => {
     const user = await sessions.requireUser(request);
@@ -22,6 +24,7 @@ export function registerStateRoutes(
     const user = await sessions.requireUser(request);
     const expectedRevision = parseIfMatch(request.headers['if-match']);
     const state = await states.replace(user, await readJsonBody(request), expectedRevision);
+    push.reconcile(user, state);
     stateJson(response, state);
   });
 
