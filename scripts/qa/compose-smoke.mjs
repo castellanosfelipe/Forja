@@ -34,7 +34,7 @@ async function docker(commands, timeout = 12 * 60_000) {
   });
 }
 async function request(path, options = {}) {
-  return fetch(`http://127.0.0.1:${port}${path}`, { redirect: 'manual', ...options, headers: { Host: `localhost:${port}`, Origin: origin, ...options.headers }, signal: AbortSignal.timeout(15_000) });
+  return fetch(`${origin}${path}`, { redirect: 'manual', ...options, headers: { Origin: origin, ...options.headers }, signal: AbortSignal.timeout(15_000) });
 }
 const result = { project, startedAt: new Date().toISOString(), status: 'FAIL', checks: [] };
 let started = false;

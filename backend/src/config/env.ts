@@ -12,6 +12,15 @@ export interface AppConfig {
   sessionTtlSeconds: number;
   authFlowTtlSeconds: number;
   secureCookies: boolean;
+  databaseUrl: string | null;
+  serverless: boolean;
+  publicAppUrl: string;
+  cronSecret: string | null;
+  qstash: {
+    token: string | null;
+    currentSigningKey: string | null;
+    nextSigningKey: string | null;
+  };
   vapid: {
     subject: string | null;
     publicKey: string | null;
@@ -102,6 +111,38 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     throw new Error('VAPID_SUBJECT, VAPID_PUBLIC_KEY, and VAPID_PRIVATE_KEY must be set together');
   }
 
+  const serverless = env.VERCEL === '1';
+  const databaseUrl = env.DATABASE_URL?.trim() || null;
+  if (databaseUrl && !/^postgres(?:ql)?:\/\//i.test(databaseUrl)) {
+    throw new Error('DATABASE_URL must be a PostgreSQL connection string');
+  }
+  if (serverless && !databaseUrl) {
+    throw new Error('DATABASE_URL is required on Vercel');
+  }
+
+  const publicAppUrl = env.PUBLIC_APP_URL?.trim() || expectedOrigins[0]!;
+  if (!expectedOrigins.includes(publicAppUrl)) {
+    throw new Error('PUBLIC_APP_URL must be one of the configured EXPECTED_ORIGIN values');
+  }
+
+  const qstashToken = env.QSTASH_TOKEN?.trim() || null;
+  const qstashCurrentSigningKey = env.QSTASH_CURRENT_SIGNING_KEY?.trim() || null;
+  const qstashNextSigningKey = env.QSTASH_NEXT_SIGNING_KEY?.trim() || null;
+  const qstashValues = [qstashToken, qstashCurrentSigningKey, qstashNextSigningKey].filter(Boolean);
+  if (qstashValues.length !== 0 && qstashValues.length !== 3) {
+    throw new Error('QSTASH_TOKEN and both QStash signing keys must be set together');
+  }
+  if (serverless && nodeEnv === 'production' && qstashValues.length !== 3) {
+    throw new Error('QStash credentials are required on Vercel for background rest timers');
+  }
+  if (serverless && nodeEnv === 'production' && configuredVapidValues.length !== 3) {
+    throw new Error('VAPID credentials are required on Vercel for push notifications');
+  }
+  const cronSecret = env.CRON_SECRET?.trim() || null;
+  if (serverless && nodeEnv === 'production' && (!cronSecret || cronSecret.length < 16)) {
+    throw new Error('CRON_SECRET with at least 16 characters is required on Vercel');
+  }
+
   return {
     nodeEnv,
     port: positiveInteger(env.PORT, 3000, 'PORT'),
@@ -113,6 +154,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     sessionTtlSeconds: positiveInteger(env.SESSION_TTL_SECONDS, 60 * 60 * 24 * 30, 'SESSION_TTL_SECONDS'),
     authFlowTtlSeconds: positiveInteger(env.AUTH_FLOW_TTL_SECONDS, 5 * 60, 'AUTH_FLOW_TTL_SECONDS'),
     secureCookies: origins.every((origin) => origin.protocol === 'https:'),
+    databaseUrl,
+    serverless,
+    publicAppUrl,
+    cronSecret,
+    qstash: {
+      token: qstashToken,
+      currentSigningKey: qstashCurrentSigningKey,
+      nextSigningKey: qstashNextSigningKey,
+    },
     vapid: {
       subject: vapidSubject,
       publicKey: vapidPublicKey,

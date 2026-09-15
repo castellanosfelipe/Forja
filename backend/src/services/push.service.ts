@@ -1,23 +1,36 @@
 import { randomUUID } from 'node:crypto';
+import { Client, Receiver } from '@upstash/qstash';
 import webPush, { type PushSubscription } from 'web-push';
 import type { AppConfig } from '../config/env.js';
 import type { BodyMeasurementReminder, PushSubscriptionRecord, RestTimerRecord, User, UserState } from '../domain/models.js';
 import { badRequest, notFound, serviceUnavailable } from '../http/errors.js';
 import { assertPublicPushDestination, publicPushAgent, validatePushSubscription } from '../utils/push-validation.js';
-import type { UserStateRepository } from '../repositories/user-state.repository.js';
+import type { AccountRepository, StateRepository } from '../repositories/contracts.js';
 
 export class PushService {
   private readonly handles = new Map<string, NodeJS.Timeout>();
   private readonly enabled: boolean;
+  private readonly qstash: Client | null;
+  private readonly qstashReceiver: Receiver | null;
 
   public constructor(
     private readonly config: AppConfig,
-    private readonly states: UserStateRepository,
+    private readonly states: StateRepository,
+    private readonly accounts?: AccountRepository,
   ) {
     this.enabled = Boolean(config.vapid.subject && config.vapid.publicKey && config.vapid.privateKey);
     if (this.enabled) {
       webPush.setVapidDetails(config.vapid.subject!, config.vapid.publicKey!, config.vapid.privateKey!);
     }
+    this.qstash = config.qstash?.token
+      ? new Client({ token: config.qstash.token, enableTelemetry: false })
+      : null;
+    this.qstashReceiver = config.qstash?.currentSigningKey && config.qstash.nextSigningKey
+      ? new Receiver({
+          currentSigningKey: config.qstash.currentSigningKey,
+          nextSigningKey: config.qstash.nextSigningKey,
+        })
+      : null;
   }
 
   public publicKey(): string {
@@ -100,7 +113,23 @@ export class PushService {
     await this.states.mutate(user, (state) => {
       state.restTimers.push(record);
     });
-    this.arm(user, record);
+    if (this.config.serverless) {
+      try {
+        await this.scheduleDurableDelivery(user, record);
+      } catch (error) {
+        await this.states.mutate(user, (state) => {
+          const timer = state.restTimers.find((candidate) => candidate.id === record.id);
+          if (timer?.status === 'scheduled') {
+            timer.status = 'failed';
+            timer.completedAt = new Date().toISOString();
+          }
+        });
+        this.logTaskError(user, 'qstash-schedule', error);
+        throw serviceUnavailable('No pudimos programar la notificación de descanso. Inténtalo nuevamente.');
+      }
+    } else {
+      this.arm(user, record);
+    }
     return record;
   }
 
@@ -120,7 +149,7 @@ export class PushService {
   }
 
   public async restore(users: User[]): Promise<void> {
-    if (!this.enabled) return;
+    if (!this.enabled || this.config.serverless) return;
     for (const user of users) {
       try {
       const state = await this.states.getOrCreate(user);
@@ -142,6 +171,55 @@ export class PushService {
     this.armMeasurementReminder(user, state);
   }
 
+  public async handleDurableDelivery(rawBody: string, signature: string | undefined): Promise<void> {
+    if (!this.qstashReceiver || !signature) throw notFound('Notification delivery endpoint not found');
+    const verified = await this.qstashReceiver.verify({
+      signature,
+      body: rawBody,
+      url: `${this.publicAppUrl()}/api/internal/qstash`,
+      clockTolerance: 5,
+    }).catch(() => false);
+    if (!verified) throw notFound('Notification delivery endpoint not found');
+    let payload: unknown;
+    try { payload = JSON.parse(rawBody) as unknown; }
+    catch { throw badRequest('Invalid delivery payload'); }
+    if (!payload || typeof payload !== 'object') throw badRequest('Invalid delivery payload');
+    const value = payload as Record<string, unknown>;
+    if (value.kind !== 'rest-timer' || typeof value.userId !== 'string' || typeof value.timerId !== 'string') {
+      throw badRequest('Invalid delivery payload');
+    }
+    if (!this.accounts) throw serviceUnavailable('Notification account storage is not configured');
+    const user = await this.accounts.findUserById(value.userId);
+    if (!user) return;
+    await this.deliver(user, value.timerId);
+  }
+
+  public async processDueNotifications(): Promise<{ timers: number; measurements: number }> {
+    if (!this.accounts) throw serviceUnavailable('Notification account storage is not configured');
+    const snapshot = await this.accounts.snapshot();
+    let timers = 0;
+    let measurements = 0;
+    for (const user of snapshot.users) {
+      try {
+        const state = await this.states.getOrCreate(user);
+        for (const timer of state.restTimers) {
+          if (timer.status === 'scheduled' && Date.parse(timer.dueAt) <= Date.now()) {
+            await this.deliver(user, timer.id);
+            timers += 1;
+          }
+        }
+        if (state.bodyMeasurementReminder.enabled && state.pushSubscriptions.length > 0 &&
+            Date.parse(state.bodyMeasurementReminder.nextDueAt) <= Date.now()) {
+          await this.deliverMeasurementReminder(user);
+          measurements += 1;
+        }
+      } catch (error) {
+        this.logTaskError(user, 'scheduled-notifications', error);
+      }
+    }
+    return { timers, measurements };
+  }
+
   private logTaskError(user: User, task: string, error: unknown): void {
     console.error(JSON.stringify({level:'error',event:'push_task_failed',userId:user.id,task,message:error instanceof Error?error.message:'unknown error'}));
   }
@@ -152,6 +230,7 @@ export class PushService {
   }
 
   private arm(user: User, timer: RestTimerRecord): void {
+    if (this.config.serverless) return;
     const key = this.timerKey(user.id, timer.id);
     const existing = this.handles.get(key);
     if (existing) clearTimeout(existing);
@@ -167,6 +246,7 @@ export class PushService {
   }
 
   private armMeasurementReminder(user: User, state: UserState): void {
+    if (this.config.serverless) return;
     const key = this.measurementKey(user.id);
     const existing = this.handles.get(key);
     if (existing) clearTimeout(existing);
@@ -269,6 +349,23 @@ export class PushService {
       }
     });
     await this.syncMeasurementReminder(user);
+  }
+
+  private async scheduleDurableDelivery(user: User, timer: RestTimerRecord): Promise<void> {
+    if (!this.qstash) throw serviceUnavailable('El programador de notificaciones no está configurado');
+    await this.qstash.publishJSON({
+      url: `${this.publicAppUrl()}/api/internal/qstash`,
+      body: { kind: 'rest-timer', userId: user.id, timerId: timer.id },
+      notBefore: Math.floor(Date.parse(timer.dueAt) / 1_000),
+      deduplicationId: `forja-rest-${timer.id}`,
+      retries: 4,
+      timeout: 15,
+      label: 'forja-rest-timer',
+    });
+  }
+
+  private publicAppUrl(): string {
+    return this.config.publicAppUrl ?? this.config.expectedOrigins?.[0] ?? 'http://localhost:8080';
   }
 
   private toWebPushSubscription(record: PushSubscriptionRecord): PushSubscription {

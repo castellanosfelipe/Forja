@@ -15,13 +15,13 @@ import type {
   User,
 } from '../domain/models.js';
 import { badRequest, conflict, forbidden, unauthorized } from '../http/errors.js';
-import type { DatabaseRepository } from '../repositories/database.repository.js';
+import type { AccountRepository } from '../repositories/contracts.js';
 import { objectBody, stringField, username as normalizeUsername } from '../utils/validation.js';
 
 export class WebAuthnService {
   public constructor(
     private readonly config: AppConfig,
-    private readonly database: DatabaseRepository,
+    private readonly database: AccountRepository,
   ) {}
 
   public async beginRegistration(

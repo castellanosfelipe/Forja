@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { WorkoutExercise, WorkoutSession, WorkoutSet } from '../../domain/models.js';
-import type { UserStateRepository } from '../../repositories/user-state.repository.js';
+import type { StateRepository } from '../../repositories/contracts.js';
 import type { ProgressionService } from '../../services/progression.service.js';
 import type { SessionService } from '../../services/session.service.js';
 import {
@@ -20,7 +20,7 @@ import { validateWorkoutExercises } from '../../utils/state-validation.js';
 export function registerWorkoutRoutes(
   router: Router,
   sessions: SessionService,
-  states: UserStateRepository,
+  states: StateRepository,
   progression: ProgressionService,
 ): void {
   router.add('GET', '/api/workouts/previous/:exerciseId', async ({ request, response, params }) => {

@@ -1,7 +1,7 @@
 import type { Exercise } from '../../types/state';
 
 export const MAX_GUIDE_BYTES = 256 * 1024;
-export const MAX_GUIDES_BYTES = 4 * 1024 * 1024;
+export const MAX_GUIDES_BYTES = 2 * 1024 * 1024;
 export type CustomGuide = NonNullable<Exercise['guideMedia']>;
 
 export function guideBytes(dataUrl: string): number {

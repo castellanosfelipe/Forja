@@ -2,8 +2,8 @@ import type { IncomingMessage } from 'node:http';
 import type { Router } from '../router.js';
 import { readJsonBody } from '../request.js';
 import { json, noContent } from '../response.js';
-import type { DatabaseRepository } from '../../repositories/database.repository.js';
-import type { UserStateRepository } from '../../repositories/user-state.repository.js';
+import type { AccountRepository, StateRepository } from '../../repositories/contracts.js';
+import type { StoredPasskey, User } from '../../domain/models.js';
 import type { SessionService } from '../../services/session.service.js';
 import type { WebAuthnService } from '../../services/webauthn.service.js';
 import type { PasswordAuthService } from '../../services/password-auth.service.js';
@@ -12,8 +12,8 @@ import type { PushService } from '../../services/push.service.js';
 import { objectBody, stringField } from '../../utils/validation.js';
 
 interface AuthRouteDependencies {
-  database: DatabaseRepository;
-  states: UserStateRepository;
+  database: AccountRepository;
+  states: StateRepository;
   sessions: SessionService;
   webauthn: WebAuthnService;
   passwords: PasswordAuthService;
@@ -98,8 +98,7 @@ export function registerAuthRoutes(router: Router, dependencies: AuthRouteDepend
   });
 }
 
-function publicUser(user: Awaited<ReturnType<DatabaseRepository['findUserById']>> & object): unknown {
-  const typed = user as NonNullable<Awaited<ReturnType<DatabaseRepository['findUserById']>>>;
+function publicUser(typed: User): unknown {
   return {
     id: typed.id,
     username: typed.username,
@@ -111,11 +110,16 @@ function publicUser(user: Awaited<ReturnType<DatabaseRepository['findUserById']>
 }
 
 function clientKey(request: IncomingMessage): string {
-  const forwarded = request.headers['x-real-ip'];
-  return (Array.isArray(forwarded) ? forwarded[0] : forwarded) || request.socket.remoteAddress || 'unknown';
+  const realIp = headerValue(request.headers['x-real-ip']);
+  const forwarded = headerValue(request.headers['x-forwarded-for'])?.split(',')[0]?.trim();
+  return (realIp || forwarded || request.socket.remoteAddress || 'unknown').slice(0, 200);
 }
 
-function publicPasskey(passkey: NonNullable<Awaited<ReturnType<DatabaseRepository['findUserById']>>>['passkeys'][number]): unknown {
+function headerValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function publicPasskey(passkey: StoredPasskey): unknown {
   return {
     id: passkey.id,
     transports: passkey.transports,

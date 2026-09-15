@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ExerciseMedia } from '../features/exercises/ExerciseMedia';
-import { checkGuideCapacity, guideBytes, MAX_GUIDE_BYTES, prepareGuideImage, validGuideImage } from '../features/exercises/custom-media';
+import { checkGuideCapacity, guideBytes, MAX_GUIDE_BYTES, MAX_GUIDES_BYTES, prepareGuideImage, validGuideImage } from '../features/exercises/custom-media';
 import type { Exercise } from '../types/state';
 
 const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l1EAAAAASUVORK5CYII=';
@@ -20,7 +20,8 @@ describe('custom exercise images', () => {
   });
   it('enforces aggregate capacity and credits a replaced image', () => {
     const large = { ...exercise.guideMedia!, dataUrl: `data:image/jpeg;base64,${'A'.repeat(MAX_GUIDE_BYTES * 4 / 3 + 4)}` };
-    const library = Array.from({ length: 16 }, (_, i) => ({ ...exercise, id: `${i}`, guideMedia: large }));
+    const fullCapacityCount = Math.floor(MAX_GUIDES_BYTES / MAX_GUIDE_BYTES);
+    const library = Array.from({ length: fullCapacityCount }, (_, i) => ({ ...exercise, id: `${i}`, guideMedia: large }));
     expect(() => checkGuideCapacity(library, large)).toThrow(/espacio/);
     expect(() => checkGuideCapacity(library, exercise.guideMedia!, '0')).not.toThrow();
   });

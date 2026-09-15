@@ -1,6 +1,6 @@
 # FORJA Backend
 
-Servidor HTTP nativo de Node.js para autenticación con contraseña o Passkeys, persistencia JSON, entrenamientos, progresión y temporizadores mediante Web Push. Las contraseñas se derivan con `scrypt` y una sal aleatoria por cuenta; nunca se persisten en texto plano.
+Servidor HTTP nativo de Node.js para autenticación con contraseña o Passkeys, entrenamientos, progresión y temporizadores mediante Web Push. Usa Neon PostgreSQL cuando existe `DATABASE_URL`; sin ella conserva el almacenamiento JSON local. Las contraseñas se derivan con `scrypt` y una sal aleatoria por cuenta; nunca se persisten en texto plano.
 
 ## Requisitos
 
@@ -28,7 +28,7 @@ node -e "console.log(require('node:crypto').randomBytes(48).toString('base64url'
 npx web-push generate-vapid-keys
 ```
 
-`EXPECTED_ORIGIN` admite varios orígenes exactos separados por coma. `RP_ID` debe ser el hostname, sin esquema ni puerto.
+`EXPECTED_ORIGIN` admite varios orígenes exactos separados por coma. `RP_ID` debe ser el hostname, sin esquema ni puerto. La configuración completa de Neon, QStash, cron y VAPID para serverless está en [`../docs/vercel-neon.md`](../docs/vercel-neon.md).
 
 ## API
 

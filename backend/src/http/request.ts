@@ -8,6 +8,22 @@ export async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   if (contentType !== 'application/json') {
     throw new HttpError(415, 'UNSUPPORTED_MEDIA_TYPE', 'Content-Type must be application/json');
   }
+  const rawBody = await readRawBody(request);
+  if (!rawBody) return {};
+  try {
+    return JSON.parse(rawBody) as unknown;
+  } catch {
+    throw badRequest('Request body contains invalid JSON');
+  }
+}
+
+export async function readRawBody(request: IncomingMessage): Promise<string> {
+  const helperBody = (request as IncomingMessage & { body?: unknown }).body;
+  if (helperBody !== undefined && helperBody !== null) {
+    if (typeof helperBody === 'string') return helperBody;
+    if (Buffer.isBuffer(helperBody)) return helperBody.toString('utf8');
+    return JSON.stringify(helperBody);
+  }
   const chunks: Buffer[] = [];
   let total = 0;
   for await (const chunk of request) {
@@ -18,12 +34,7 @@ export async function readJsonBody(request: IncomingMessage): Promise<unknown> {
     }
     chunks.push(buffer);
   }
-  if (chunks.length === 0) return {};
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8')) as unknown;
-  } catch {
-    throw badRequest('Request body contains invalid JSON');
-  }
+  return Buffer.concat(chunks).toString('utf8');
 }
 
 export function parseIfMatch(header: string | undefined): number | null {

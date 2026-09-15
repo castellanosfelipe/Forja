@@ -1,6 +1,6 @@
 import type { UserState } from '../domain/models.js';
 import { GYM_EXERCISE_CATALOG } from '../domain/exercise-catalog.js';
-import { badRequest } from '../http/errors.js';
+import { HttpError, badRequest } from '../http/errors.js';
 import { isoDate, isoDateTime } from './validation.js';
 import { validatePushSubscription } from './push-validation.js';
 
@@ -109,6 +109,9 @@ function guideSize(value: unknown, path: string): number {
 }
 
 export function validateStateDocument(candidate: unknown): asserts candidate is UserState {
+  if (Buffer.byteLength(JSON.stringify(candidate)) > 4_000_000) {
+    throw new HttpError(413, 'PAYLOAD_TOO_LARGE', 'State exceeds the 4 MB account limit');
+  }
   const s = record(candidate,'state');
   oneOf(s.schemaVersion,[1],'schemaVersion');
   num(s.revision,'revision',1,Number.MAX_SAFE_INTEGER,true);
@@ -126,7 +129,7 @@ export function validateStateDocument(candidate: unknown): asserts candidate is 
     const muscles=record(ex.muscles,`${p}.muscles`);strings(muscles.primary,`${p}.muscles.primary`);strings(muscles.secondary,`${p}.muscles.secondary`);
     if(ex.guideMedia!==undefined)imageBytes+=guideSize(ex.guideMedia,`${p}.guideMedia`);
   },2000);
-  if(imageBytes>4*1024*1024)fail('exerciseLibrary','custom images exceed 4 MiB in total');
+  if(imageBytes>2*1024*1024)fail('exerciseLibrary','custom images exceed 2 MiB in total');
   const exerciseIds=new Set([...GYM_EXERCISE_CATALOG.map(ex=>ex.id),...library.map(ex=>String(ex.id))]);
   const weight=record(s.bodyWeight,'bodyWeight');
   nullable(weight.goal,'bodyWeight.goal',(v,p)=>{const goal=record(v,p);num(goal.targetKg,`${p}.targetKg`,20,500);nullable(goal.targetDate,`${p}.targetDate`,date);});

@@ -126,7 +126,7 @@ describe('production API regressions', () => {
     Buffer.from([137,80,78,71,13,10,26,10]).copy(data);
     data.write('IHDR', 12, 'ascii');
     for (const exercise of initial.exerciseLibrary.slice(0, 17)) exercise.guideMedia = { kind: 'image', dataUrl: `data:image/png;base64,${data.toString('base64')}`, alt: 'Guía de prueba de límite' };
-    expect((await request('PUT', '/api/state', initial)).status).toBe(400);
+    expect((await request('PUT', '/api/state', initial)).status).toBe(413);
     expect((await (await request('GET', '/api/state')).json() as UserState).exerciseLibrary.every((exercise) => exercise.guideMedia === undefined)).toBe(true);
   });
 

@@ -1,15 +1,27 @@
 import { access } from 'node:fs/promises';
 import type { Database, StoredPasskey, User } from '../domain/models.js';
-import { conflict, notFound, serviceUnavailable } from '../http/errors.js';
+import { conflict, notFound, serviceUnavailable, tooManyRequests } from '../http/errors.js';
 import { deepClone, Mutex, readJson, writeJsonAtomic } from '../utils/atomic-json.js';
+import type { AccountRepository } from './contracts.js';
 
 const EMPTY_DATABASE: Database = {
   schemaVersion: 1,
   users: [],
 };
 
-export class DatabaseRepository {
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1_000;
+const MAX_FAILURES = 5;
+const BLOCK_MS = 15 * 60 * 1_000;
+
+interface LoginAttempt {
+  failures: number;
+  windowStartedAt: number;
+  blockedUntil: number;
+}
+
+export class DatabaseRepository implements AccountRepository {
   private readonly mutex = new Mutex();
+  private readonly loginAttempts = new Map<string, LoginAttempt>();
 
   public constructor(private readonly filePath: string) {}
 
@@ -80,6 +92,31 @@ export class DatabaseRepository {
       db.authFlows!.splice(index, 1);
       return true;
     });
+  }
+
+  public async reservePasswordAttempt(key: string): Promise<boolean> {
+    const now = Date.now();
+    for (const [candidate, entry] of this.loginAttempts) {
+      if (entry.blockedUntil <= now && now - entry.windowStartedAt >= ATTEMPT_WINDOW_MS) {
+        this.loginAttempts.delete(candidate);
+      }
+    }
+    const current = this.loginAttempts.get(key);
+    if (!current && this.loginAttempts.size >= 10_000) {
+      throw tooManyRequests('Demasiados intentos. Vuelve a intentarlo más tarde');
+    }
+    const attempt = !current || now - current.windowStartedAt >= ATTEMPT_WINDOW_MS
+      ? { failures: 0, windowStartedAt: now, blockedUntil: 0 }
+      : current;
+    if (attempt.blockedUntil > now || attempt.failures >= MAX_FAILURES) return false;
+    attempt.failures += 1;
+    if (attempt.failures >= MAX_FAILURES) attempt.blockedUntil = now + BLOCK_MS;
+    this.loginAttempts.set(key, attempt);
+    return true;
+  }
+
+  public async clearPasswordAttempts(key: string): Promise<void> {
+    this.loginAttempts.delete(key);
   }
 
   private pruneAuthentication(db: Database): void {

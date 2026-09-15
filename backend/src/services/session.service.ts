@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { AppConfig } from '../config/env.js';
 import type { AuthFlowClaims, SessionClaims, User } from '../domain/models.js';
 import { unauthorized } from '../http/errors.js';
-import type { DatabaseRepository } from '../repositories/database.repository.js';
+import type { AccountRepository } from '../repositories/contracts.js';
 import { appendSetCookie, parseCookies, serializeCookie } from '../utils/cookies.js';
 import { SignedTokenService } from './signed-token.service.js';
 
@@ -15,7 +15,7 @@ export class SessionService {
 
   public constructor(
     private readonly config: AppConfig,
-    private readonly database: DatabaseRepository,
+    private readonly database: AccountRepository,
   ) {
     this.tokens = new SignedTokenService(config.sessionSecret);
   }

@@ -2,7 +2,7 @@
 
 > Entrena. Registra. Evoluciona.
 
-PWA autoalojada para registrar entrenamiento y peso corporal. React y la API Node se publican bajo un único origen mediante Nginx. Las cuentas pueden usar usuario y contraseña, Passkeys/WebAuthn o ambos métodos; Service Worker y Web Push funcionan bajo el mismo dominio.
+PWA privada para registrar entrenamiento y peso corporal. React y la API Node se publican bajo un único origen mediante Vercel en producción o Nginx en local. Neon conserva los datos de producción; Docker mantiene disponible el almacenamiento JSON para desarrollo. Las cuentas pueden usar usuario y contraseña, Passkeys/WebAuthn o ambos métodos; Service Worker y Web Push funcionan bajo el mismo dominio.
 
 Incluye seguimiento de composición corporal con IMC, método de perímetros US Navy, masa magra, FFMI, gasto energético Mifflin–St Jeor y macros por objetivo. Un recordatorio mensual dentro de la PWA y mediante Web Push solicita repetir los perímetros; se reprograma al guardar una medición válida y puede aplazarse siete días. La cadena de calculadoras toma inspiración funcional de [BodyCalc](https://github.com/castellanosfelipe/Body_Calc), publicado bajo licencia MIT, y guarda cada medición en el JSON privado del usuario.
 
@@ -37,15 +37,10 @@ docker compose stop
 
 Los datos activos se guardan en `data/db.json` y `data/state-<id>.json`. Los archivos `*.example.json` documentan el esquema y sí pueden versionarse; los datos activos y `.env` están excluidos por `.gitignore`.
 
-## Producción
+## Producción en Vercel + Neon
 
-WebAuthn y las API PWA requieren un contexto seguro. `localhost` es válido para desarrollo; cualquier acceso desde otro equipo debe publicarse por HTTPS. Configura en `.env` el hostname exacto como `RP_ID` y la URL HTTPS completa como `EXPECTED_ORIGIN`, y termina TLS delante del Nginx incluido sin separar el origen de `/api`.
+WebAuthn y las API PWA requieren HTTPS y un origen estable. El proyecto incluye una función Node en `/api`, persistencia PostgreSQL para Neon, programación durable de descansos con QStash, cron de recuperación y el fallback correcto de React Router.
 
-Antes de exponer el servicio:
+Sigue la [guía de publicación en Vercel + Neon](docs/vercel-neon.md) para configurar el dominio, las variables, migrar los JSON existentes y validar contraseña, passkeys y notificaciones. El dominio debe decidirse antes de registrar passkeys; las URLs variables de Preview no sustituyen el dominio de producción.
 
-- conserva `APP_BIND_ADDRESS=127.0.0.1` si hay otro proxy TLS en el host;
-- respalda la carpeta `data/` y restringe sus permisos al usuario del servicio;
-- mantiene `.env` fuera del control de versiones;
-- rota `SESSION_SECRET` y las claves VAPID si se filtran.
-
-La documentación específica está en `backend/README.md` y `frontend/README.md`. Consulta también la [guía de producción, copias y recuperación](docs/production.md) y ejecuta sus controles antes de publicar.
+La documentación técnica adicional está en `backend/README.md`, `frontend/README.md` y la [guía de operación, copias y recuperación](docs/production.md).

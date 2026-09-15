@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { BodyWeightEntry } from '../../domain/models.js';
-import type { UserStateRepository } from '../../repositories/user-state.repository.js';
+import type { StateRepository } from '../../repositories/contracts.js';
 import type { SessionService } from '../../services/session.service.js';
 import { objectBody, isoDateTime, nullableStringField, numberField, stringField } from '../../utils/validation.js';
 import { readJsonBody, parseIfMatch } from '../request.js';
@@ -12,7 +12,7 @@ import type { PushService } from '../../services/push.service.js';
 export function registerStateRoutes(
   router: Router,
   sessions: SessionService,
-  states: UserStateRepository,
+  states: StateRepository,
   push: PushService,
 ): void {
   router.add('GET', '/api/state', async ({ request, response }) => {

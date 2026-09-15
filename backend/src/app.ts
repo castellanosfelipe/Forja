@@ -10,7 +10,10 @@ import { registerAuthRoutes } from './http/routes/auth.routes.js';
 import { registerPushRoutes } from './http/routes/push.routes.js';
 import { registerStateRoutes } from './http/routes/state.routes.js';
 import { registerWorkoutRoutes } from './http/routes/workout.routes.js';
+import { registerInternalRoutes } from './http/routes/internal.routes.js';
 import { DatabaseRepository } from './repositories/database.repository.js';
+import { NeonDatabaseRepository } from './repositories/neon-database.repository.js';
+import { NeonUserStateRepository } from './repositories/neon-user-state.repository.js';
 import { UserStateRepository } from './repositories/user-state.repository.js';
 import { ProgressionService } from './services/progression.service.js';
 import { PasswordAuthService } from './services/password-auth.service.js';
@@ -20,18 +23,23 @@ import { WebAuthnService } from './services/webauthn.service.js';
 
 export interface Application {
   handler: RequestListener;
+  handle(request: IncomingMessage, response: ServerResponse): Promise<void>;
   initialize(): Promise<void>;
   close(): Promise<void>;
 }
 
 export function createApplication(config: AppConfig): Application {
-  const database = new DatabaseRepository(join(config.dataDir, 'db.json'));
-  const states = new UserStateRepository(config.dataDir);
+  const database = config.databaseUrl
+    ? new NeonDatabaseRepository(config.databaseUrl)
+    : new DatabaseRepository(join(config.dataDir, 'db.json'));
+  const states = config.databaseUrl
+    ? new NeonUserStateRepository(config.databaseUrl)
+    : new UserStateRepository(config.dataDir);
   const sessions = new SessionService(config, database);
   const webauthn = new WebAuthnService(config, database);
   const passwords = new PasswordAuthService(database);
   const progression = new ProgressionService();
-  const push = new PushService(config, states);
+  const push = new PushService(config, states, database);
   const router = new Router();
 
   router.add('GET', '/api/health', ({ response }) => {
@@ -46,6 +54,7 @@ export function createApplication(config: AppConfig): Application {
   registerStateRoutes(router, sessions, states, push);
   registerWorkoutRoutes(router, sessions, states, progression);
   registerPushRoutes(router, sessions, push);
+  registerInternalRoutes(router, config, push);
 
   const handler: RequestListener = (request, response) => {
     void handleRequest(config, router, request, response);
@@ -53,10 +62,15 @@ export function createApplication(config: AppConfig): Application {
 
   return {
     handler,
+    handle(request, response) {
+      return handleRequest(config, router, request, response);
+    },
     async initialize() {
       await database.initialize();
-      const snapshot = await database.snapshot();
-      await push.restore(snapshot.users);
+      if (!config.serverless) {
+        const snapshot = await database.snapshot();
+        await push.restore(snapshot.users);
+      }
     },
     async close() {
       push.shutdown();
@@ -98,6 +112,8 @@ async function handleRequest(
 function enforceSameOrigin(config: AppConfig, request: IncomingMessage): void {
   const method = request.method?.toUpperCase() ?? 'GET';
   if (['GET', 'HEAD', 'OPTIONS'].includes(method)) return;
+  const path = new URL(request.url ?? '/', 'http://internal').pathname;
+  if (path === '/api/internal/qstash') return;
   const origin = request.headers.origin;
   if (origin && !config.expectedOrigins.includes(origin)) {
     throw forbidden('Cross-origin requests are not allowed');
