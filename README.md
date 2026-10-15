@@ -2,7 +2,9 @@
 
 > Entrena. Registra. Evoluciona.
 
-FORJA es una aplicación web instalable para planificar entrenamientos, registrar cada serie y seguir la evolución del peso y la composición corporal. Puedes crear una cuenta con usuario y contraseña, añadir una passkey para entrar con tu dispositivo y conservar tus datos en una instalación propia o en Vercel + Neon.
+FORJA te ayuda a entrenar con constancia: planifica tus rutinas, registra cada sesión y visualiza tu progreso para avanzar hacia tus objetivos físicos.
+
+Está pensada para quienes quieren organizar su entrenamiento de fuerza y dar continuidad a sus rutinas. Reúne tu plan semanal, el registro de cada serie y la evolución de tus mediciones en una aplicación web que puedes instalar en tu dispositivo.
 
 [![Recorrido visual de FORJA: acceso, panel, métricas, plan, biblioteca y entrenamiento](docs/media/forja-tour.webp)](docs/media/forja-tour.mp4)
 
@@ -10,14 +12,20 @@ FORJA es una aplicación web instalable para planificar entrenamientos, registra
 
 Los videos son montajes silenciosos de capturas de la interfaz, no grabaciones de interacción en tiempo real. El perfil y las mediciones mostrados son ficticios; no se usaron datos de usuarios reales.
 
-## Lo que puedes hacer
+## Del plan al progreso
 
-- **Empezar a tu manera:** crea una cuenta con usuario y contraseña, registra una o varias passkeys y administra tus métodos de acceso. El asistente inicial solicita objetivos, disponibilidad y contexto corporal solo en el primer ingreso; puedes abrirlo de nuevo desde la interfaz para revisar los datos y regenerar el plan sin borrar tus sesiones.
-- **Entrenar con un plan propio:** organiza la semana y reprograma días concretos sin modificar el plan base. El generador considera objetivo, experiencia, equipo, prioridades y movimientos sensibles para proponer una rutina de 2 a 6 días.
-- **Encontrar y entender cada ejercicio:** explora 195 ejercicios base distribuidos en 16 categorías, con búsqueda, filtros y guías visuales autoalojadas. Puedes crear ejercicios propios y adjuntar una imagen. Las demostraciones base usan imágenes estáticas en lugar de GIF; los movimientos personalizados sin imagen se identifican claramente.
-- **Registrar el trabajo real:** el entrenamiento guiado recupera cargas previas, registra series, repeticiones o tiempo, descansos y esfuerzo opcional mediante RPE/RIR. Solicita mantener la pantalla encendida cuando el dispositivo admite Wake Lock. Calcula el 1RM estimado y propone cargas con progresión lineal, Greyskull LP o doble progresión, incluyendo estancamientos y descargas.
-- **Seguir tus avances:** consulta tendencia de peso y meta, constancia anual, carga reciente y mapa muscular. Registra perímetros y compara estimaciones de IMC, grasa corporal, masa magra, FFMI, gasto energético y macronutrientes. Un recordatorio mensual ayuda a repetir las mediciones.
-- **Usarla como PWA:** instala la web, vuelve a abrir pantallas y guías consultadas sin conexión y sincroniza cambios pendientes cuando regresa la red. Las notificaciones Web Push pueden avisar de descansos y mediciones si el navegador y el usuario lo permiten; su entrega no sustituye una alarma garantizada.
+- **Planifica una semana que encaje contigo:** genera una rutina de 2 a 6 días según tu objetivo, experiencia, disponibilidad, equipo y prioridades. Organiza tus sesiones y reprograma días concretos sin cambiar el plan base.
+- **Registra cada sesión con contexto:** consulta tus cargas anteriores y anota series, repeticiones o tiempo, descansos y esfuerzo. El entrenamiento guiado te acompaña ejercicio a ejercicio para que puedas revisar lo que realmente hiciste.
+- **Haz visible tu constancia y evolución:** consulta tu actividad anual, carga reciente y grupos musculares trabajados. Sigue la tendencia de peso, tu meta y el historial de mediciones corporales para reconocer cambios a lo largo del tiempo.
+- **Ajusta tu entrenamiento a medida que avanzas:** recibe propuestas de carga basadas en tu registro y vuelve a revisar tus objetivos y disponibilidad desde el asistente. Puedes regenerar el plan sin borrar las sesiones anteriores.
+
+## Herramientas para acompañar tu rutina
+
+- **Ejercicios a tu alcance:** explora 195 ejercicios base en 16 categorías, con búsqueda, filtros y guías visuales alojadas con la aplicación. Añade ejercicios propios y una imagen para reconocerlos. Las guías base usan imágenes estáticas; los movimientos personalizados sin imagen se identifican claramente.
+- **Más detalle cuando lo necesitas:** registra el esfuerzo con RPE/RIR, consulta el 1RM estimado y utiliza progresión lineal, Greyskull LP o doble progresión, con seguimiento de estancamientos y descargas. Cuando el dispositivo admite Wake Lock, FORJA solicita mantener la pantalla encendida durante la sesión.
+- **Mediciones conectadas:** registra perímetros y consulta estimaciones de IMC, grasa corporal, masa magra, FFMI, gasto energético y macronutrientes. Un recordatorio mensual te ayuda a repetir las mediciones.
+- **Tu rutina también sin conexión:** instala FORJA como PWA, vuelve a abrir pantallas y guías que ya consultaste y guarda cambios pendientes para sincronizarlos cuando regresa la red. Web Push puede avisarte de descansos y mediciones si el navegador y tus permisos lo permiten; su entrega no sustituye una alarma garantizada.
+- **Acceso desde tu dispositivo:** crea una cuenta con usuario y contraseña, añade una o varias passkeys y administra tus métodos de acceso. Puedes conservar tus datos en una instalación propia o desplegar FORJA en Vercel + Neon.
 
 RPE significa *escala de esfuerzo percibido* y RIR, *repeticiones en reserva*. La interfaz incluye ayuda contextual para estas y otras abreviaturas. Las estimaciones de composición y nutrición son orientativas, no un diagnóstico ni una prescripción clínica.
 
@@ -41,6 +49,13 @@ RPE significa *escala de esfuerzo percibido* y RIR, *repeticiones en reserva*. L
 ![FORJA en una pantalla móvil](docs/media/forja-mobile.jpg)
 
 Las capturas son una muestra de la versión actual y pueden variar ligeramente con cambios posteriores de la interfaz.
+
+## Tu primera sesión con FORJA
+
+1. [Inicia una instalación local](#empezar-en-local-con-docker) o [despliega tu instancia](#publicar-en-vercel--neon) y crea tu cuenta.
+2. Completa el asistente inicial con tu objetivo, experiencia, disponibilidad y equipo para generar tu plan.
+3. Abre el entrenamiento guiado y registra las series de tu primera sesión.
+4. Consulta el panel para revisar tu actividad y sigue registrando entrenamientos y mediciones para construir tu historial.
 
 ## Empezar en local con Docker
 
