@@ -1,4 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import { createServer } from 'node:http';
+import { mkdtemp, rm, rmdir } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { AppConfig } from '../src/config/env.js';
 import { loadConfig } from '../src/config/env.js';
 import type { User, UserState } from '../src/domain/models.js';
@@ -84,5 +88,47 @@ describe('durable rest timer scheduling', () => {
       deduplicationId: `forja-rest-${timer.id}`,
     }));
     service.shutdown();
+  });
+});
+
+describe('Vercel Node entrypoint', () => {
+  it('serves nested API paths and preserves the signed QStash payload', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'forja-vercel-entrypoint-'));
+    const environment = {
+      NODE_ENV: 'test', VERCEL: '0', DATABASE_URL: '', DATA_DIR: directory,
+      RP_ID: 'localhost', EXPECTED_ORIGIN: 'http://localhost:8080',
+      PUBLIC_APP_URL: 'http://localhost:8080', SESSION_SECRET: 'test-session-secret-that-is-long-enough',
+      QSTASH_TOKEN: 'token', QSTASH_CURRENT_SIGNING_KEY: 'current', QSTASH_NEXT_SIGNING_KEY: 'next',
+      VAPID_SUBJECT: '', VAPID_PUBLIC_KEY: '', VAPID_PRIVATE_KEY: '',
+    };
+    for (const [key, value] of Object.entries(environment)) vi.stubEnv(key, value);
+    mocks.verify.mockReset().mockResolvedValue(true);
+    const { default: handler } = await import('../../api/index.js');
+    const server = createServer((request, response) => { void handler(request, response); });
+    try {
+      await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+      const address = server.address();
+      if (!address || typeof address === 'string') throw new Error('Server did not expose a TCP address');
+      const origin = `http://127.0.0.1:${address.port}`;
+      const session = await fetch(`${origin}/api/auth/session`);
+      expect(session.status).toBe(200);
+      await expect(session.json()).resolves.toEqual({ authenticated: false, user: null });
+
+      const body = '{\n  "kind": "rest-timer", "userId": "missing-user", "timerId": "timer"\n}\n';
+      const delivery = await fetch(`${origin}/api/internal/qstash`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'upstash-signature': 'signature' },
+        body,
+      });
+      expect(delivery.status).toBe(204);
+      expect(mocks.verify).toHaveBeenCalledWith({
+        signature: 'signature', body, url: 'http://localhost:8080/api/internal/qstash', clockTolerance: 5,
+      });
+    } finally {
+      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+      vi.unstubAllEnvs();
+      await rm(join(directory, 'db.json'), { force: true });
+      await rmdir(directory);
+    }
   });
 });

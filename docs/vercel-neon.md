@@ -6,7 +6,7 @@ Docker y los archivos JSON continúan disponibles para desarrollo local. En Verc
 
 ## 1. Preparar los servicios
 
-1. Importa el repositorio en Vercel con la raíz del proyecto como **Root Directory**. `vercel.json` selecciona Vite, construye `frontend/dist` y enruta `/api/*` a la función Node.
+1. Importa el repositorio en Vercel con la raíz del proyecto como **Root Directory**. `vercel.json` selecciona Vite, construye `frontend/dist` y reescribe `/api/:path*` a la función Node `api/index.ts`, incluidas las rutas anidadas de autenticación y notificaciones.
 2. Añade la integración de Neon al proyecto y crea una base o rama exclusiva para FORJA. Comprueba que Vercel haya creado `DATABASE_URL` para Production.
 3. Crea una cuenta QStash en Upstash y copia `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` y `QSTASH_NEXT_SIGNING_KEY`.
 4. Elige el dominio definitivo. Puede ser un dominio propio o el dominio estable de producción de Vercel. No registres passkeys hasta decidirlo.

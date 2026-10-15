@@ -108,7 +108,7 @@ Para una comprobación de contenedores con datos temporales y Docker operativo, 
 | --- | --- | --- |
 | Web React, Vite y PWA | [`frontend/`](frontend/README.md) | Pantallas, estado local, Service Worker y recursos de ejercicios. |
 | API Node y dominio | [`backend/`](backend/README.md) | Autenticación, persistencia, sesiones, entrenamientos y Push. |
-| Despliegue serverless | [`api/[...path].ts`](api/%5B...path%5D.ts), [`vercel.json`](vercel.json) | API bajo el mismo origen que la PWA. |
+| Despliegue serverless | [`api/index.ts`](api/index.ts), [`vercel.json`](vercel.json) | API bajo el mismo origen que la PWA. |
 | Instalación local | [`docker-compose.yml`](docker-compose.yml), [`nginx.conf`](nginx.conf) | Proxy Nginx, frontend, backend y archivos JSON. |
 | Medios de este README | [`docs/media/`](docs/media/) | Capturas, vista previa animada y videos de demostración. |
 
