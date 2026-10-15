@@ -8,7 +8,7 @@ Docker y los archivos JSON continúan disponibles para desarrollo local. En Verc
 
 1. Importa el repositorio en Vercel con la raíz del proyecto como **Root Directory**. `vercel.json` selecciona Vite, construye `frontend/dist` y reescribe `/api/:path*` a la función Node `api/index.ts`, incluidas las rutas anidadas de autenticación y notificaciones.
 2. Añade la integración de Neon al proyecto y crea una base o rama exclusiva para FORJA. Comprueba que Vercel haya creado `DATABASE_URL` para Production.
-3. Crea una cuenta QStash en Upstash y copia `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` y `QSTASH_NEXT_SIGNING_KEY`.
+3. Crea o conecta QStash desde Upstash o su integración en Vercel y copia `QSTASH_URL`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` y `QSTASH_NEXT_SIGNING_KEY` de la misma región.
 4. Elige el dominio definitivo. Puede ser un dominio propio o el dominio estable de producción de Vercel. No registres passkeys hasta decidirlo.
 
 Las ramas Preview pueden usar contraseña para QA. No añadas sus URLs variables a la configuración de WebAuthn de producción.
@@ -20,6 +20,7 @@ Configura estas variables en **Project Settings → Environment Variables → Pr
 | Variable | Valor |
 | --- | --- |
 | `NODE_ENV` | `production` |
+| `NPM_CONFIG_INCLUDE` | `dev`, para instalar TypeScript y Vite durante la compilación con `NODE_ENV=production` |
 | `DATABASE_URL` | Conexión PostgreSQL entregada por Neon |
 | `RP_ID` | Hostname definitivo, sin `https://`, puerto ni ruta |
 | `RP_NAME` | `FORJA` |
@@ -29,10 +30,13 @@ Configura estas variables en **Project Settings → Environment Variables → Pr
 | `VAPID_SUBJECT` | Contacto, por ejemplo `mailto:admin@example.com` |
 | `VAPID_PUBLIC_KEY` | Clave pública VAPID |
 | `VAPID_PRIVATE_KEY` | Clave privada VAPID |
-| `QSTASH_TOKEN` | Token QStash |
+| `QSTASH_URL` | Endpoint de la región QStash; US East: `https://qstash-us-east-1.upstash.io`; EU: `https://qstash-eu-central-1.upstash.io` |
+| `QSTASH_TOKEN` | Token QStash de la misma región que `QSTASH_URL` |
 | `QSTASH_CURRENT_SIGNING_KEY` | Clave de firma QStash actual |
 | `QSTASH_NEXT_SIGNING_KEY` | Siguiente clave de firma QStash |
 | `CRON_SECRET` | Secreto aleatorio de 32 bytes o más |
+
+El SDK usa EU si no defines `QSTASH_URL`; configura el endpoint explícitamente para US East. Consulta las [regiones de QStash](https://upstash.com/docs/qstash/howto/multi-region) y el efecto de [`NODE_ENV` en la instalación de dependencias](https://vercel.com/kb/guide/dependencies-from-package-json-missing-after-install). Después de cambiar variables, vuelve a desplegar para aplicarlas.
 
 Generación local de secretos:
 

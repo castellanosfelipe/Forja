@@ -6,6 +6,8 @@ FORJA te ayuda a entrenar con constancia: planifica tus rutinas, registra cada s
 
 Está pensada para quienes quieren organizar su entrenamiento de fuerza y dar continuidad a sus rutinas. Reúne tu plan semanal, el registro de cada serie y la evolución de tus mediciones en una aplicación web que puedes instalar en tu dispositivo.
 
+[Abrir la instancia desplegada de FORJA](https://forja-six-wine.vercel.app)
+
 [![Recorrido visual de FORJA: acceso, panel, métricas, plan, biblioteca y entrenamiento](docs/media/forja-tour.webp)](docs/media/forja-tour.mp4)
 
 [Ver recorrido completo (video, 24 s)](docs/media/forja-tour.mp4) · [Ver el modo de entrenamiento (video, 11 s)](docs/media/forja-training.mp4) · [Ver la pantalla de acceso](docs/media/forja-login.jpg)
@@ -87,7 +89,9 @@ La configuración de producción sirve el frontend y `/api` desde un mismo domin
 
 Sigue la [guía paso a paso de Vercel + Neon](docs/vercel-neon.md) para conectar la base de datos, configurar QStash y Web Push, elegir el dominio, preparar las variables y validar el despliegue. Como mínimo, revisa `DATABASE_URL`, `RP_ID`, `EXPECTED_ORIGIN`, `PUBLIC_APP_URL`, `SESSION_SECRET`, VAPID, QStash y `CRON_SECRET`. El dominio de una passkey debe permanecer estable: cambiarlo después de registrar usuarios puede impedir que esas credenciales vuelvan a funcionar.
 
-Si ya tienes datos JSON, la guía incluye una migración con modo de simulación. El repositorio contiene la configuración para desplegarse; no implica que exista una instancia pública activa.
+Con `NODE_ENV=production`, configura `NPM_CONFIG_INCLUDE=dev` para instalar las herramientas de compilación. Define `QSTASH_URL` según la región de tus credenciales; para US East usa `https://qstash-us-east-1.upstash.io`.
+
+Si ya tienes datos JSON, la guía incluye una migración con modo de simulación.
 
 ## Desarrollo y verificación
 
