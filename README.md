@@ -6,7 +6,7 @@ FORJA te ayuda a entrenar con constancia: planifica tus rutinas, registra cada s
 
 Está pensada para quienes quieren organizar su entrenamiento de fuerza y dar continuidad a sus rutinas. Reúne tu plan semanal, el registro de cada serie y la evolución de tus mediciones en una aplicación web que puedes instalar en tu dispositivo.
 
-[Abrir la instancia desplegada de FORJA](https://forja-six-wine.vercel.app)
+[Abrir la instancia desplegada de FORJA](https://forja.felipepena.co)
 
 [![Recorrido visual de FORJA: acceso, panel, métricas, plan, biblioteca y entrenamiento](docs/media/forja-tour.webp)](docs/media/forja-tour.mp4)
 

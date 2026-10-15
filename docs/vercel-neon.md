@@ -22,10 +22,10 @@ Configura estas variables en **Project Settings → Environment Variables → Pr
 | `NODE_ENV` | `production` |
 | `NPM_CONFIG_INCLUDE` | `dev`, para instalar TypeScript y Vite durante la compilación con `NODE_ENV=production` |
 | `DATABASE_URL` | Conexión PostgreSQL entregada por Neon |
-| `RP_ID` | Hostname definitivo, sin `https://`, puerto ni ruta |
+| `RP_ID` | Hostname definitivo, sin `https://`, puerto ni ruta; por ejemplo `forja.felipepena.co` |
 | `RP_NAME` | `FORJA` |
-| `EXPECTED_ORIGIN` | URL HTTPS exacta, por ejemplo `https://forja.example.com` |
-| `PUBLIC_APP_URL` | La misma URL HTTPS de producción |
+| `EXPECTED_ORIGIN` | URL HTTPS exacta, por ejemplo `https://forja.felipepena.co` |
+| `PUBLIC_APP_URL` | La misma URL HTTPS de producción, por ejemplo `https://forja.felipepena.co` |
 | `SESSION_SECRET` | Secreto aleatorio de 48 bytes o más |
 | `VAPID_SUBJECT` | Contacto, por ejemplo `mailto:admin@example.com` |
 | `VAPID_PUBLIC_KEY` | Clave pública VAPID |
