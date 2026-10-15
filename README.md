@@ -6,7 +6,7 @@ FORJA te ayuda a entrenar con constancia: planifica tus rutinas, registra cada s
 
 Está pensada para quienes quieren organizar su entrenamiento de fuerza y dar continuidad a sus rutinas. Reúne tu plan semanal, el registro de cada serie y la evolución de tus mediciones en una aplicación web que puedes instalar en tu dispositivo.
 
-[Abrir la instancia desplegada de FORJA](https://forja.felipepena.co)
+**[Empezar a entrenar con FORJA](https://forja.felipepena.co)**
 
 [![Recorrido visual de FORJA: acceso, panel, métricas, plan, biblioteca y entrenamiento](docs/media/forja-tour.webp)](docs/media/forja-tour.mp4)
 
@@ -27,7 +27,7 @@ Los videos son montajes silenciosos de capturas de la interfaz, no grabaciones d
 - **Más detalle cuando lo necesitas:** registra el esfuerzo con RPE/RIR, consulta el 1RM estimado y utiliza progresión lineal, Greyskull LP o doble progresión, con seguimiento de estancamientos y descargas. Cuando el dispositivo admite Wake Lock, FORJA solicita mantener la pantalla encendida durante la sesión.
 - **Mediciones conectadas:** registra perímetros y consulta estimaciones de IMC, grasa corporal, masa magra, FFMI, gasto energético y macronutrientes. Un recordatorio mensual te ayuda a repetir las mediciones.
 - **Tu rutina también sin conexión:** instala FORJA como PWA, vuelve a abrir pantallas y guías que ya consultaste y guarda cambios pendientes para sincronizarlos cuando regresa la red. Web Push puede avisarte de descansos y mediciones si el navegador y tus permisos lo permiten; su entrega no sustituye una alarma garantizada.
-- **Acceso desde tu dispositivo:** crea una cuenta con usuario y contraseña, añade una o varias passkeys y administra tus métodos de acceso. Puedes conservar tus datos en una instalación propia o desplegar FORJA en Vercel + Neon.
+- **Acceso desde tu dispositivo:** crea una cuenta con usuario y contraseña, añade una o varias passkeys para volver a entrar desde tu dispositivo y administra tus métodos de acceso.
 
 RPE significa *escala de esfuerzo percibido* y RIR, *repeticiones en reserva*. La interfaz incluye ayuda contextual para estas y otras abreviaturas. Las estimaciones de composición y nutrición son orientativas, no un diagnóstico ni una prescripción clínica.
 
@@ -54,10 +54,12 @@ Las capturas son una muestra de la versión actual y pueden variar ligeramente c
 
 ## Tu primera sesión con FORJA
 
-1. [Inicia una instalación local](#empezar-en-local-con-docker) o [despliega tu instancia](#publicar-en-vercel--neon) y crea tu cuenta.
+1. Abre [FORJA](https://forja.felipepena.co) y crea tu cuenta con usuario y contraseña.
 2. Completa el asistente inicial con tu objetivo, experiencia, disponibilidad y equipo para generar tu plan.
 3. Abre el entrenamiento guiado y registra las series de tu primera sesión.
 4. Consulta el panel para revisar tu actividad y sigue registrando entrenamientos y mediciones para construir tu historial.
+
+Puedes instalar FORJA desde el menú de tu navegador compatible para abrirla como una aplicación. Si prefieres operar tu propia instancia, consulta las guías de [Docker](#empezar-en-local-con-docker) o [Vercel + Neon](#publicar-en-vercel--neon).
 
 ## Empezar en local con Docker
 
@@ -84,6 +86,8 @@ Para detenerla sin eliminar los datos, ejecuta `docker compose stop`. El modo lo
 > Antes de exponer Docker a Internet, coloca un proxy HTTPS delante, fija el dominio de WebAuthn y sigue las medidas de [operación y copias de seguridad](docs/production.md). No compartas el directorio JSON entre varias réplicas del backend.
 
 ## Publicar en Vercel + Neon
+
+La instancia pública de FORJA está desplegada en Vercel con Neon y QStash, bajo el dominio `forja.felipepena.co`. En ese despliegue, `RP_ID=forja.felipepena.co`, mientras que `EXPECTED_ORIGIN` y `PUBLIC_APP_URL` usan `https://forja.felipepena.co`. Si publicas otra instancia, sustituye estos valores por tu propio dominio.
 
 La configuración de producción sirve el frontend y `/api` desde un mismo dominio HTTPS. La función Node usa Neon PostgreSQL para cuentas, passkeys, sesiones y estados; QStash programa avisos de descanso y un cron diario recupera tareas y procesa recordatorios de perímetros. En Vercel no se utiliza el almacenamiento JSON local.
 
